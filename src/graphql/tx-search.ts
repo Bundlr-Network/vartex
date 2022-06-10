@@ -179,7 +179,7 @@ export const findTxIDsFromTxFilters = async (
     R.isEmpty(txFilterKeys) && !R.isEmpty(queryParameters.tags)
   );
   const isBucketSearchTx = Boolean(
-    R.isEmpty(txFilterKeys) && R.isEmpty(queryParameters.tags)
+      R.isEmpty(txFilterKeys.filter(k => k != "ids")) && R.isEmpty(queryParameters.tags)
   );
 
   const table = isBucketSearchTag
