@@ -184,6 +184,9 @@ export const findTxIDsFromTxFilters = async (
       (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags)
   );
 
+  console.log(`R.isEmpty(txFilterKeys) ${R.isEmpty(txFilterKeys)}`);
+  console.log(`R.equals(txFilterKeys, ["ids"]) ${R.equals(txFilterKeys, ["ids"])}`);
+  console.log(`R.isEmpty(queryParameters.tags) ${R.isEmpty(queryParameters.tags)}`);
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
