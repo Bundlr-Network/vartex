@@ -474,14 +474,14 @@ module.exports = async (client) => {
     while (migrationState.current < migrationState.goal) {
       console.log(migrationState);
       let blockHashQ = await client.execute(
-        `SELECT block_hash FROM ${KEYSPACE}.block_height_by_block_hash WHERE block_height = ${migrationState.current}`
+        `SELECT block_hash FROM ${KEYSPACE}.block_height_to_hash WHERE block_height = ${migrationState.current}`
       );
       if (blockHashQ.rows.length === 0) {
         await importBlock(migrationState.current);
         // allow it to settle
         await new Promise((resolve) => setTimeout(resolve, 30000));
         blockHashQ = await client.execute(
-          `SELECT block_hash FROM ${KEYSPACE}.block_height_by_block_hash WHERE block_height = ${migrationState.current}`
+          `SELECT block_hash FROM ${KEYSPACE}.block_height_to_hash WHERE block_height = ${migrationState.current}`
         );
       }
       const blockHash = blockHashQ.rows[0].block_hash;

@@ -1,6 +1,6 @@
 import * as R from "rambda";
 import { remove } from "ramda";
-import megaTagPairs from "../../static/mega-tagpairs.json";
+import megaTagPairs from "../../static/mega-tagpairs.json" assert {type: "json"}
 import { cassandraClient } from "../database/cassandra";
 import { toLong } from "../database/utils";
 import { types as CassandraTypes } from "cassandra-driver";
