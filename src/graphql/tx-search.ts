@@ -173,6 +173,8 @@ export const findTxIDsFromTxFilters = async (
   const txFilterKeys = buildTxFilterKey(queryParameters);
   const tableKey = txFilterKeys.sort().join("_");
 
+  console.log("txFilterKeys ", txFilterKeys)
+
   const sortOrder =
     queryParameters.sort === "HEIGHT_ASC" ? "HEIGHT_ASC" : "HEIGHT_DESC";
   const isBucketSearchTag = Boolean(
