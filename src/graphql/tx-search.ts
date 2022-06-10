@@ -179,8 +179,11 @@ export const findTxIDsFromTxFilters = async (
     R.isEmpty(txFilterKeys) && !R.isEmpty(queryParameters.tags)
   );
   const isBucketSearchTx = Boolean(
-      R.isEmpty(txFilterKeys.filter(k => k != "ids")) && R.isEmpty(queryParameters.tags)
+      (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags)
   );
+
+  console.log(`isBucketSearchTag ${isBucketSearchTag}`);
+  console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
   const table = isBucketSearchTag
     ? sortOrder === "HEIGHT_ASC"
