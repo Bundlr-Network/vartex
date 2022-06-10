@@ -1,5 +1,5 @@
-const exitHook = require('exit-hook');
-const child_process = require('child_process');
+import exitHook from 'exit-hook';
+import child_process from 'child_process';
 
 const date = new Date();
 const timestamp = [
