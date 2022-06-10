@@ -29,7 +29,7 @@
     "prestart": "yarn run gql && yarn run migrate:init",
     "start": "yarn run prestart && TS_NODE_FILES=true node --experimental-specifier-resolution=node --max-old-space-size=4096 --loader ts-node/esm.mjs src/gateway.ts",
     "start:gw-node": "yarn run gql && VARTEX_GW_NODE=1 TS_NODE_FILES=true node --experimental-specifier-resolution=node --max-old-space-size=4096 --loader ts-node/esm.mjs src/gateway.ts",
-    "start:prod": "yarn run prestart && node start.cjs",
+    "start:prod": "yarn run prestart && node start.mjs",
     "cache:purge": "rm -rf cache/imports",
     "migrate:init": "node cassandra/init.cjs",
     "prepare": "husky install"
