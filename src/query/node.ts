@@ -5,9 +5,13 @@ import rwc from "random-weighted-choice";
 import got from "got";
 import { log } from "../utility/log";
 import { ChunkType, getChunk } from "./chunk";
+import { config } from "dotenv";
 
+config();
+console.log(process.env.ARWEAVE_NODES);
 let temporaryNodes = [];
 try {
+  console.log()
   temporaryNodes = process.env.ARWEAVE_NODES
     ? JSON.parse(process.env.ARWEAVE_NODES)
     : ["http://lon-4.eu-west-1.arweave.net:1984"];
