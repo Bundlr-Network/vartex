@@ -37,7 +37,7 @@ if (messenger) {
 
 const log = mkWorkerLog(messenger);
 
-const concurrency = env.PARALLEL_TX_IMPORTS;
+const concurrency = env.PARALLEL_TX_IMPORT;
 
 const queue = new PQueue({ concurrency });
 
