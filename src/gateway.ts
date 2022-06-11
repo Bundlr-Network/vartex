@@ -24,6 +24,7 @@ import { types as CassandraTypes } from "cassandra-driver";
 import { cassandraClient } from "./database/cassandra";
 import { startSync } from "./database/sync";
 import { env, isGatewayNodeModeEnabled } from "./constants";
+import pino from "express-pino-logger";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const { default: expressPlayground } = gpmeImport as any;
@@ -40,6 +41,8 @@ function poweredBy(r: Request, response: Response, next: () => void) {
     next();
   }
 }
+
+app.use(pino);
 
 app.enable("strict routing");
 
@@ -129,6 +132,7 @@ app.use(permawebSandboxMiddleware);
 app.use(appendSlashMiddleware);
 
 export function start(): void {
+
   app.set("trust proxy", 1);
   app.set("query parser", "simple");
 

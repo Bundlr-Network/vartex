@@ -123,6 +123,7 @@ export async function dataRoute(
   request: Partial<Request & { txid?: string }>,
   response: Response
 ): Promise<void> {
+
   let firstPath: string;
   let subPath: string;
 
@@ -170,10 +171,12 @@ export async function dataRoute(
     }
   }
 
+  console.log(`Looking in db - ${txId}`);
   const txDatabase = await transactionMapper.get({ tx_id: txId });
   let txUpstream: TransactionType | undefined;
 
   if (!txDatabase) {
+    console.log(`Not found in db - ${txId}`);
     try {
       txUpstream = await getTransaction({ txId, retry: 2 });
     } catch {
@@ -188,6 +191,8 @@ export async function dataRoute(
   if (!offset) {
     offset = await getTxOffset({ txId });
   }
+
+  console.log(`Got offset - ${txId}`);
 
   if (offset) {
     const tags = txUpstream
