@@ -85,12 +85,12 @@ function permawebSandboxMiddleware(
     request.originalUrl.replace(/^\//, "").replace(/\/.*/, "").length === 43
   ) {
     const requestPath = request.originalUrl.replace(/^\//, "");
-    const requestTxId = requestPath.replace(/\/.*/, "");
+    // const requestTxId = requestPath.replace(/\/.*/, "");
     const requestSubPath = requestPath.replace(/.*\//, "");
     const query = request.url.slice(request.path.length);
     response.redirect(
       302,
-      `${request.protocol}://${requestTxId}.${
+      `${request.protocol}://${
         request.host.endsWith(":80") || request.host.endsWith(":443")
           ? request.hostname
           : request.host
