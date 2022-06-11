@@ -96,6 +96,8 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
     return TxReturnCode.REQUEUE;
   }
 
+  console.log(`Got block ${block.height}`);
+
   if (!block.txs.includes(txId)) {
     log(
       `Abandoned tx detected? It was not found in txs of block ${blockHash}, therefore dequeue-ing ${txId}`
@@ -106,6 +108,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 
   // check if it's already imported, or is attached to abandoned fork
   const maybeImportedTx = await transactionMapper.get({ txId });
+
 
   if (maybeImportedTx) {
     if (maybeImportedTx.block_hash === blockHash) {
@@ -122,12 +125,17 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
     }
   }
 
+  console.log(`Tx ${txId} not imported yet`);
+
+
   const tx: TransactionType | undefined = await getTransaction({ txId });
 
   if (!tx) {
     log(`Failed to fetch ${txId} from nodes`);
     return TxReturnCode.REQUEUE;
   }
+
+  console.log(`Got tx from node - ${txId}`);
 
   const dataSize = toLong(tx.data_size);
 
@@ -165,6 +173,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   }
 
   try {
+    console.log(`Inserting gql tags for ${txId}...`);
     await insertGqlTag(tx);
   } catch (error) {
     log(JSON.stringify(error));
@@ -172,6 +181,8 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   }
 
   try {
+    console.log(`Inserting tx for ${txId}...`);
+
     await insertTx({
       tx_index: txIndex,
       data_item_index: toLong(-1),
