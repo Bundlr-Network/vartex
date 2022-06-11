@@ -70,6 +70,8 @@ export const insertGqlTag = async (
 
       environment.bundled_in ??= "";
 
+      console.log(`environment ${environment}`)
+
       let index = 0;
       for (const { name, value } of tx.tags) {
         const [tag_name, tag_value] = [name, value];
@@ -80,6 +82,7 @@ export const insertGqlTag = async (
         });
 
         console.log(insertObject);
+        console.log(`insertObject ${insertObject}`);
 
         await tagMapper.insert(insertObject);
         index += 1;
