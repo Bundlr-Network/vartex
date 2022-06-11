@@ -43,9 +43,20 @@ export const insertTx = async (
     tx: Transaction & { data_item_index?: CassandraTypes.Long, offset?: CassandraTypes.Long }
 ): Promise<void> => {
   const data_item_index = tx.data_item_index ?? toLong(-1);
-  await transactionMapper.insert(tx);
-  const nthMillion = tx.block_height.mul(1e6);
-  await txsSortedAscMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
-  await txsSortedDescMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
-  if (data_item_index.eq(toLong(-1))) await txOffsetMapper.insert({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
+  try {
+    await transactionMapper.insert(tx);
+    console.log(`Inserted into transactionMapper - ${tx.tx_id}`);
+    const nthMillion = tx.block_height.mul(1e6);
+    await txsSortedAscMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+    console.log(`Inserted into txsSortedAscMapper - ${tx.tx_id}`);
+    await txsSortedDescMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+    console.log(`Inserted into txsSortedDescMapper - ${tx.tx_id}`);
+    if (data_item_index.eq(toLong(-1))) {
+      await txOffsetMapper.insert({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
+      console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
 }
