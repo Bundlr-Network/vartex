@@ -128,6 +128,9 @@ export async function dataRoute(
   let firstPath: string;
   let subPath: string;
 
+  console.log(request.params);
+  console.log(request.path);
+
   if (!request.txid) {
     // sandbox-mode
     if (request.params["0"]) {
