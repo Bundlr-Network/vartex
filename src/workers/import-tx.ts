@@ -47,7 +47,7 @@ const queue = new PQueue({ concurrency });
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
 export const insertGqlTag = async (
-  tx: Omit<TransactionType, 'data'>
+  tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long }
 ): Promise<void> => {
   if (!R.isEmpty(tx.tags)) {
     for (const tagModelName of Object.keys(tagModels)) {
@@ -174,7 +174,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 
   try {
     console.log(`Inserting gql tags for ${txId}...`);
-    await insertGqlTag(tx);
+    await insertGqlTag({ ...tx, tx_index: txIndex });
   } catch (error) {
     log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
