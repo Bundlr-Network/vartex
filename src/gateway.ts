@@ -176,7 +176,7 @@ export function start(): void {
   app.post("/api", proxyPostRoute);
   app.get(/\/price.*/, proxyGetRoute);
   app.get(/\/wallet.*/, proxyGetRoute);
-  app.use(dataPathRegex, dataRoute);
+  app.get(dataPathRegex, dataRoute);
   // graphql endpoints
   const graphqlServer = graphServer({ introspection: true });
   graphqlServer.start().then(() => {
