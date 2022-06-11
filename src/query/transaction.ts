@@ -42,18 +42,19 @@ export async function getTransaction({
   retry?: number;
 }): Promise<TransactionType | undefined> {
   const tryNode = grabNode();
+
+  console.log(`Trying to get ${txId} from ${tryNode}`);
   let jsonPayload: TransactionType | undefined;
   try {
     jsonPayload = await got.get(`${tryNode}/tx/${txId}`, {
       responseType: "json",
       resolveBodyOnly: true,
     });
-  } catch {
-    // console.error(error.name, `${tryNode}/tx/${txId}`, "\n");
+  } catch (error) {
     coolNode(tryNode);
     if (retry > 100) {
       console.error(
-        "getTransaction: Failed to get txId: " + txId + " after 100 retries\n"
+        `getTransaction: Failed to get txId: " + txId + " after 100 retries - ${error}\n`
       );
       return undefined;
       // process.exit(1);
