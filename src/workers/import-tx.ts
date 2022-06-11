@@ -280,7 +280,8 @@ export async function consumeQueueOnce(): Promise<void> {
       console.error(`Error occurred while importing tx - ${error}`);
     }
   });
+  console.log(importTxScheduler.name);
 
-  await importTxScheduler.run();
-  // await worker.run();
+  // await importTxScheduler.run();
+  await worker.run();
 })();
