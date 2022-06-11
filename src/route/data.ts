@@ -125,14 +125,14 @@ export async function dataRoute(
 ): Promise<void> {
   console.log("HIT");
 
-  let firstPath: string;
+  let firstPath: string = request.params.txid;
   let subPath: string;
 
   console.log(request.txid);
   console.log(request.params);
   console.log(request.path);
 
-  if (!request.params.txid || request.params.txid.match(/[\w-]{43}/i)?.length === 0) {
+  if (!firstPath || firstPath?.match(/[\w-]{43}/i)?.length === 0) {
     // sandbox-mode
     if (request.params["0"]) {
       firstPath = request.params["0"];
