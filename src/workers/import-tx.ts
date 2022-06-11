@@ -66,6 +66,7 @@ export const insertGqlTag = async (
         environment.owner.length > 43
       ) {
         environment.owner = ownerToAddress(environment.owner);
+        environment.bundled_in ??= "";
       }
 
       let index = 0;
