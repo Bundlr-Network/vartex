@@ -66,8 +66,9 @@ export const insertGqlTag = async (
         environment.owner.length > 43
       ) {
         environment.owner = ownerToAddress(environment.owner);
-        environment.bundled_in ??= "hi";
       }
+
+      environment.bundled_in ??= "";
 
       let index = 0;
       for (const { name, value } of tx.tags) {
