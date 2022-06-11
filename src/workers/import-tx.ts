@@ -18,8 +18,8 @@ import { mkWorkerLog } from "../utility/log";
 import { env, KEYSPACE } from "../constants";
 import { tagModels } from "../database/tags-mapper";
 import * as MQ from "bullmq";
-import {ImportTxJob, importTxQueue} from "../queue";
-import {loggers} from "winston";
+import { ImportTxJob, importTxQueue } from "../queue";
+
 
 enum TxReturnCode {
   OK,
@@ -116,7 +116,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
     } else {
       log(
         `Misplaced transaction ${txId}! Perhaps block with hash ${maybeImportedTx.block_hash} was abandoned?\n` +
-          `Moving on to import the tx to block ${blockHash} at height ${block.height }`
+        `Moving on to import the tx to block ${blockHash} at height ${block.height}`
       );
       return TxReturnCode.DEQUEUE;
     }
@@ -273,7 +273,7 @@ export async function consumeQueueOnce(): Promise<void> {
 (async function () {
   const importTxScheduler = new MQ.QueueScheduler(importTxQueue.name);
 
-  const worker = new MQ.Worker<ImportTxJob>(importTxQueue.name, async function(job) {
+  const worker = new MQ.Worker<ImportTxJob>(importTxQueue.name, async function (job) {
     try {
       await importTx(job.data.tx_id, job.data.block_hash);
     } catch (error) {

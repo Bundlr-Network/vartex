@@ -5,13 +5,12 @@ import {
   blockHeightToHashMapper,
   blockMapper,
   blockSortedAscMapper,
-  blockSortedDescMapper,
-  txQueueMapper,
+  blockSortedDescMapper
 } from "../database/mapper";
 import { toLong } from "../database/utils";
 import { getMessenger } from "../gatsby-worker/child";
 import { mkWorkerLog } from "../utility/log";
-import {importTxQueue} from "../queue";
+import { importTxQueue } from "../queue";
 
 let messenger = getMessenger<MessagesFromParent, MessagesFromWorker>();
 
@@ -48,7 +47,7 @@ export async function importBlock(
 
   if (Array.isArray(newBlock.txs)) {
     for (const txId of newBlock.txs) {
-      await importTxQueue.add("Import tx",{
+      await importTxQueue.add("Import tx", {
         tx_id: txId,
         block_hash: newBlock.indep_hash,
         block_height: height,
@@ -85,7 +84,7 @@ export async function importBlock(
   let nthMillBlock;
   try {
     nthMillBlock = toLong(newBlock.height).div(1e6).toInt();
-  } catch {}
+  } catch { }
 
   if (typeof nthMillBlock !== "number") {
     log(
