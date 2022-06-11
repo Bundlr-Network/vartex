@@ -8,7 +8,7 @@ import { ChunkType, getChunk } from "./chunk";
 import { config } from "dotenv";
 
 config();
-console.log(process.env.ARWEAVE_NODES);
+
 let temporaryNodes = [];
 try {
   console.log()
