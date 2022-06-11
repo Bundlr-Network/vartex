@@ -1,4 +1,4 @@
-import Ar from "arweave/node/ar";
+// import Ar from "arweave/node/ar";
 import { types as CassandraTypes } from "cassandra-driver";
 import * as B64js from "base64-js";
 import { base32 } from "rfc4648";
@@ -7,7 +7,9 @@ import { Readable, PassThrough, Transform } from "node:stream";
 import { Tag } from "../types/arweave";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ar = new ((Ar as any).default as typeof Ar)();
+// const ar = new ((Ar as any).default as typeof Ar)();
+import Ar from "arweave/node/ar";
+const ar = new Ar()
 
 export type Base64EncodedString = string;
 export type Base64UrlEncodedString = string;
@@ -196,7 +198,7 @@ export function utf8DecodeTag(tag: Tag): Tag {
     if (isValidUTF8(valueBuffer)) {
       value = valueBuffer.toString("utf8");
     }
-  } catch {}
+  } catch { }
   return {
     name,
     value,
@@ -216,7 +218,7 @@ export function utf8DecodeTupleTag(tag: CassandraTypes.Tuple): Tag {
       value = valueBuffer.toString("utf8");
     }
     // eslint-disable-next-line no-empty
-  } catch {}
+  } catch { }
   return {
     name,
     value,

@@ -1706,11 +1706,6 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@k-foss/ts-esnode@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@k-foss/ts-esnode/-/ts-esnode-2.0.2.tgz#9976d2a318ef56d5dda780bdb4b715edab52307a"
-  integrity sha512-ysEOUR7EkvSsmwNc3AWUL8Rk3IT4fM6GgXImEtIGLj8nO0PGLfAp4yCsJoC6ZqwfhnTxL6viaNqnk9yqpKmx3Q==
-
 "@msgpackr-extract/msgpackr-extract-darwin-arm64@2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@msgpackr-extract/msgpackr-extract-darwin-arm64/-/msgpackr-extract-darwin-arm64-2.0.2.tgz#01e3669b8b2dc01f6353f2c87e1ec94faf52c587"
@@ -1902,7 +1897,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/amqplib@*", "@types/amqplib@^0.8.2":
+"@types/amqplib@*":
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/@types/amqplib/-/amqplib-0.8.2.tgz#9c46f2c7fac381e4f81bcb612c00d54549697d22"
   integrity sha512-p+TFLzo52f8UanB+Nq6gyUi65yecAcRY3nYowU6MPGFtaJvEDxcnFWrxssSTkF+ts1W3zyQDvgVICLQem5WxRA==

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import { types as CassandraTypes } from "cassandra-driver";
 import * as R from "rambda";
+// @ts-expect-error no type defs
 import rwc from "random-weighted-choice";
 import got from "got";
 import { log } from "../utility/log";
@@ -134,16 +135,16 @@ export async function getNodeInfo({
         } else {
           console.error(
             "\n" +
-              "getNodeInfo: failed to establish connection to any specified node after 100 retries with these nodes: " +
-              nodeTemperatures.map(R.prop("id")).join(", ") +
-              "\n"
+            "getNodeInfo: failed to establish connection to any specified node after 100 retries with these nodes: " +
+            nodeTemperatures.map(R.prop("id")).join(", ") +
+            "\n"
           );
 
           console.error(
             "\n" +
-              "Check the network status, trying again to reach some of these nodes, but it is unlikely to make a differnece:" +
-              nodeTemperatures.map(R.prop("id")).join(", ") +
-              "\n"
+            "Check the network status, trying again to reach some of these nodes, but it is unlikely to make a differnece:" +
+            nodeTemperatures.map(R.prop("id")).join(", ") +
+            "\n"
           );
           return await getNodeInfo({ retry: 0, maxRetry });
         }
