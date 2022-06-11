@@ -26,6 +26,7 @@ import { startSync } from "./database/sync";
 import { env, isGatewayNodeModeEnabled } from "./constants";
 import pino from "express-pino-logger";
 
+
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const { default: expressPlayground } = gpmeImport as any;
 
@@ -42,7 +43,7 @@ function poweredBy(r: Request, response: Response, next: () => void) {
   }
 }
 
-app.use(pino);
+app.use(pino());
 
 app.enable("strict routing");
 
