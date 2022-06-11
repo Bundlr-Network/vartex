@@ -25,7 +25,10 @@ import { cassandraClient } from "./database/cassandra";
 import { startSync } from "./database/sync";
 import { env, isGatewayNodeModeEnabled } from "./constants";
 import pino from "express-pino-logger";
-
+import { ExpressAdapter } from "@bull-board/express";
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { importBundleQueue, importTxQueue } from "./queue";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const { default: expressPlayground } = gpmeImport as any;
@@ -42,6 +45,16 @@ function poweredBy(r: Request, response: Response, next: () => void) {
     next();
   }
 }
+
+const serverAdapter = new ExpressAdapter();
+
+createBullBoard({
+    queues: [new BullMQAdapter(importTxQueue), new BullMQAdapter(importBundleQueue)],
+    serverAdapter: serverAdapter,
+});
+
+serverAdapter.setBasePath('/admin/queues');
+app.use('/admin/queues', serverAdapter.getRouter());
 
 app.use(pino());
 
