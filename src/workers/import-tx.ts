@@ -282,5 +282,5 @@ export async function consumeQueueOnce(): Promise<void> {
   });
 
   await importTxScheduler.run();
-  await worker.run();
+  // await worker.run();
 })();
