@@ -1,5 +1,6 @@
 import * as R from "rambda";
 import { remove } from "ramda";
+import megaTagPairs from "../../static/mega-tagpairs.json" assert {type: "json"}
 import { cassandraClient } from "../database/cassandra";
 import { toLong } from "../database/utils";
 import { types as CassandraTypes } from "cassandra-driver";
@@ -7,9 +8,7 @@ import { TxSearchResult } from "./resolver-types";
 import { QueryTransactionsArgs as QueryTransactionsArguments } from "./types.graphql";
 import { toB64url } from "../query/transaction";
 import { KEYSPACE } from "../constants";
-import * as fs from "node:fs";
 
-const megaTagPairs = JSON.parse(fs.readFileSync("../../static/mega-tagpairs.json").toString());
 
 const megaTagPairsList = Object.values(megaTagPairs);
 
@@ -183,7 +182,7 @@ export const findTxIDsFromTxFilters = async (
     R.isEmpty(txFilterKeys) && !R.isEmpty(queryParameters.tags)
   );
   const isBucketSearchTx = Boolean(
-      (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags || [])
+    (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags || [])
   );
 
   console.log(`R.isEmpty(txFilterKeys) ${R.isEmpty(txFilterKeys)}`);
@@ -198,10 +197,10 @@ export const findTxIDsFromTxFilters = async (
       ? "tx_gql_tags_asc"
       : "tx_gql_tags_desc"
     : isBucketSearchTx
-    ? sortOrder === "HEIGHT_ASC"
-      ? "txs_sorted_asc"
-      : "txs_sorted_desc"
-    : filtersToTable[sortOrder][tableKey];
+      ? sortOrder === "HEIGHT_ASC"
+        ? "txs_sorted_asc"
+        : "txs_sorted_desc"
+      : filtersToTable[sortOrder][tableKey];
 
   const cursorQuery =
     queryParameters.after &&
@@ -211,7 +210,7 @@ export const findTxIDsFromTxFilters = async (
   const maybeCursor = cursorQuery
     ? parseTxFilterCursor(queryParameters.after)
     : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ({} as any);
+    ({} as any);
 
   if (maybeCursor.cursorType && maybeCursor.cursorType !== "tx_search") {
     throw new Error(
@@ -227,20 +226,20 @@ export const findTxIDsFromTxFilters = async (
 
   const txsMinHeight_ =
     typeof queryParameters.block === "object" &&
-    typeof queryParameters.block.min === "number"
+      typeof queryParameters.block.min === "number"
       ? queryParameters.block.min * 1000
       : 0;
 
   const txsMinHeight =
     typeof maybeCursor.txIndex !== "undefined" &&
-    sortOrder === "HEIGHT_ASC" &&
-    toLong(maybeCursor.txIndex).gt(toLong(txsMinHeight_))
+      sortOrder === "HEIGHT_ASC" &&
+      toLong(maybeCursor.txIndex).gt(toLong(txsMinHeight_))
       ? maybeCursor.txIndex
       : txsMinHeight_;
 
   const txsMaxHeight_ =
     typeof queryParameters.block === "object" &&
-    typeof queryParameters.block.max === "number"
+      typeof queryParameters.block.max === "number"
       ? queryParameters.block.max * 1000
       : maxHeightBlock.add(1).mul(1000).toString();
 
@@ -275,38 +274,38 @@ export const findTxIDsFromTxFilters = async (
     isBucketSearchTag || isBucketSearchTx
       ? ""
       : txFilterKeys_.reduce((accumulator, key) => {
-          const k_ =
-            key === "target"
-              ? "recipients"
-              : (key as keyof QueryTransactionsArguments);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const whereVals: any = queryParameters[k_];
-          const cqlKey = R.propOr(
-            key,
-            key
-          )({
-            ids: "tx_id",
-            recipients: "target",
-            owners: "owner",
-            dataRoots: "data_root",
-            bundledIn: "bundled_in",
-            tags: "tag_pairs",
-          });
+        const k_ =
+          key === "target"
+            ? "recipients"
+            : (key as keyof QueryTransactionsArguments);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const whereVals: any = queryParameters[k_];
+        const cqlKey = R.propOr(
+          key,
+          key
+        )({
+          ids: "tx_id",
+          recipients: "target",
+          owners: "owner",
+          dataRoots: "data_root",
+          bundledIn: "bundled_in",
+          tags: "tag_pairs",
+        });
 
-          if (cqlKey === "tag_pairs") {
-            const whereValsString = tagPairs
-              .map((tp) => `AND tag_pairs CONTAINS ${tp}`)
-              .join(" ");
-            return `${accumulator} ${whereValsString}`;
-          } else {
-            const whereValsString =
-              whereVals.length === 1
-                ? ` = '${whereVals[0]}'`
-                : `IN (${whereVals.map((wv: string) => `'${wv}'`).join(",")})`;
+        if (cqlKey === "tag_pairs") {
+          const whereValsString = tagPairs
+            .map((tp) => `AND tag_pairs CONTAINS ${tp}`)
+            .join(" ");
+          return `${accumulator} ${whereValsString}`;
+        } else {
+          const whereValsString =
+            whereVals.length === 1
+              ? ` = '${whereVals[0]}'`
+              : `IN (${whereVals.map((wv: string) => `'${wv}'`).join(",")})`;
 
-            return `${accumulator} AND ${cqlKey} ${whereValsString}`;
-          }
-        }, "");
+          return `${accumulator} AND ${cqlKey} ${whereValsString}`;
+        }
+      }, "");
 
   let hasNextPage = false;
   let txsFilterRows = [];
@@ -319,15 +318,15 @@ export const findTxIDsFromTxFilters = async (
 
     const bucketStart =
       typeof maybeCursor.nthBucket !== "undefined" &&
-      maybeCursor.nthBucket !== -1 &&
-      sortOrder === "HEIGHT_ASC"
+        maybeCursor.nthBucket !== -1 &&
+        sortOrder === "HEIGHT_ASC"
         ? maybeCursor.nthBucket
         : toLong(txsMinHeight).div(1e6).toInt();
 
     const bucketEnd =
       typeof maybeCursor.nthBucket !== "undefined" &&
-      maybeCursor.nthBucket !== -1 &&
-      sortOrder === "HEIGHT_DESC"
+        maybeCursor.nthBucket !== -1 &&
+        sortOrder === "HEIGHT_DESC"
         ? maybeCursor.nthBucket + 1
         : (xBuckets.add(1).toInt() as number);
 
@@ -357,8 +356,7 @@ export const findTxIDsFromTxFilters = async (
         : "";
 
       const nextResult = await cassandraClient.execute(
-        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${
-          limit - resultCount + 1
+        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
         } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
         { prepare: true }
       );
@@ -389,8 +387,7 @@ export const findTxIDsFromTxFilters = async (
         : tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ");
 
     const txFilterQ = await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} LIMIT ${
-        limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} LIMIT ${limit + 1
       } ALLOW FILTERING`
     );
 
@@ -398,8 +395,7 @@ export const findTxIDsFromTxFilters = async (
     hasNextPage = txFilterQ.rows.length > limit;
   } else {
     const txFilterQ = await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${
-        limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${limit + 1
       } `
     );
 

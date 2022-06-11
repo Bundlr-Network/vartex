@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import { types as CassandraTypes } from "cassandra-driver";
 import * as R from "rambda";
-// @ts-expect-error no type defs
 import rwc from "random-weighted-choice";
 import got from "got";
 import { log } from "../utility/log";
