@@ -4,6 +4,8 @@ import {
   Client as CassandraClient,
 } from "cassandra-driver";
 import { KEYSPACE } from "../constants";
+import { Transaction } from "../types/cassandra";
+import { transactionMapper, txOffsetMapper, txsSortedAscMapper, txsSortedDescMapper } from "./mapper";
 
 export const toLong = (
   anyValue: CassandraTypes.Long | number | string | undefined
@@ -36,3 +38,14 @@ export const getMaxHeightBlock = async (
   }
   return lastMaxHeight;
 };
+
+export const insertTx = async (
+    tx: Transaction & { data_item_index?: CassandraTypes.Long, offset?: CassandraTypes.Long }
+): Promise<void> => {
+  const data_item_index = tx.data_item_index ?? toLong(-1);
+  await transactionMapper.insert(tx);
+  const nthMillion = tx.block_height.mul(1e6);
+  await txsSortedAscMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+  await txsSortedDescMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+  if (data_item_index.eq(toLong(-1))) await txOffsetMapper.insert({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
+}

@@ -2,22 +2,21 @@ import * as R from "rambda";
 import PQueue from "p-queue";
 import { types as CassandraTypes } from "cassandra-driver";
 import { MessagesFromParent, MessagesFromWorker } from "./message-types";
-import { Transaction, TxOffset, UpstreamTag } from "../types/cassandra";
-import { getTransaction, getTxOffset } from "../query/transaction";
+import { UpstreamTag } from "../types/cassandra";
+import {getTransaction, getTxOffset, TransactionType} from "../query/transaction";
 import { ownerToAddress } from "../utility/encoding";
 import {
   cassandraClient,
   blockMapper,
   tagsMapper,
-  tagModels,
   transactionMapper,
-  txOffsetMapper,
   txQueueMapper,
 } from "../database/mapper";
-import { toLong } from "../database/utils";
+import {insertTx, toLong} from "../database/utils";
 import { getMessenger } from "../gatsby-worker/child";
 import { mkWorkerLog } from "../utility/log";
 import { env, KEYSPACE } from "../constants";
+import {tagModels} from "../database/tags-mapper";
 
 enum TxReturnCode {
   OK,
@@ -45,9 +44,9 @@ const queue = new PQueue({ concurrency });
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
 export const insertGqlTag = async (
-  tags: CassandraTypes.TimeUuid[]
+  tx: TransactionType
 ): Promise<void> => {
-  if (!R.isEmpty(tags)) {
+  if (!R.isEmpty(tx.tags)) {
     for (const tagModelName of Object.keys(tagModels)) {
       const tagMapper = tagsMapper.forModel(tagModelName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
@@ -57,7 +56,7 @@ export const insertGqlTag = async (
 
       // until ans104 comes
       if (!environment["data_item_index"]) {
-        environment["data_item_index"] = toLong(0);
+        environment["data_item_index"] = toLong(-1);
       }
       if (
         typeof environment.owner === "string" &&
@@ -67,8 +66,8 @@ export const insertGqlTag = async (
       }
 
       let index = 0;
-      for (const tuple of tx.tags) {
-        const [tag_name, tag_value] = tuple.values();
+      for (const { name, value } of tx.tags) {
+        const [tag_name, tag_value] = [name, value];
 
         const insertObject = R.merge(environment, {
           tag_pair: `${tag_name}|${tag_value}`,
@@ -82,7 +81,8 @@ export const insertGqlTag = async (
   }
 };
 
-export const importTx = (txId: string, blockHash: string): TxReturnCode => {
+export const importTx = async (txId: string, blockHash: string): Promise<TxReturnCode> => {
+  // @ts-ignore
   const block = await blockMapper({ indep_hash: blockHash });
 
   if (!block) {
@@ -112,13 +112,13 @@ export const importTx = (txId: string, blockHash: string): TxReturnCode => {
     } else {
       log(
         `Misplaced transaction ${txId}! Perhaps block with hash ${maybeImportedTx.block_hash} was abandoned?\n` +
-          `Moving on to import the tx to block ${blockHash} at height ${blockHeight}`
+          `Moving on to import the tx to block ${blockHash} at height ${block.height }`
       );
       return TxReturnCode.DEQUEUE;
     }
   }
 
-  const tx: Transaction | undefined = await getTransaction({ txId });
+  const tx: TransactionType | undefined = await getTransaction({ txId });
 
   if (!tx) {
     log(`Failed to fetch ${txId} from nodes`);
@@ -127,18 +127,20 @@ export const importTx = (txId: string, blockHash: string): TxReturnCode => {
 
   const dataSize = toLong(tx.data_size);
 
+  let offset;
   if (dataSize && dataSize.gt(0)) {
-    const maybeTxOffset: TxOffset | undefined = await getTxOffset({ txId });
+    const maybeTxOffset: { size: string, offset: string } | undefined = await getTxOffset({ txId });
     if (!maybeTxOffset) {
       log(`Failed to fetch data offset for ${txId} from nodes`);
       return TxReturnCode.REQUEUE;
     } else {
       try {
-        await txOffsetMapper.insert({
-          tx_id: tx.id,
-          size: maybeTxOffset.size,
-          offset: maybeTxOffset.offset,
-        });
+        offset = maybeTxOffset.offset;
+        // await txOffsetMapper.insert({
+        //   tx_id: txId,
+        //   size: maybeTxOffset.size,
+        //   offset: maybeTxOffset.offset,
+        // });
       } catch (error) {
         log(JSON.stringify(error));
         return TxReturnCode.REQUEUE;
@@ -146,41 +148,42 @@ export const importTx = (txId: string, blockHash: string): TxReturnCode => {
     }
   }
 
-  const txIndex = toLong(blockHeight)
+  const txIndex = block.height
     .multiply(1000)
     .add(block.txs.indexOf(txId));
 
-  let tags = [];
+  let tags: CassandraTypes.Tuple[] = [];
 
   if (!R.isEmpty(tx.tags) && Array.isArray(tx.tags)) {
-    tags = tx.tags.map(({ name, value }: UpstreamTag) =>
-      CassandraTypes.Tuple.fromArray([name, value])
-    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    tags = tx.tags.map(({ name, value }: UpstreamTag) => CassandraTypes.Tuple.fromArray([name, value]));
   }
 
   try {
-    await insertGqlTag(tags);
+    await insertGqlTag(tx);
   } catch (error) {
     log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
   }
 
   try {
-    await transactionMapper.insert({
+    await insertTx({
       tx_index: txIndex,
       data_item_index: toLong(-1),
       block_height: block.height,
       block_hash: block.indep_hash,
       bundled_in: null /* eslint-disable-line unicorn/no-null */,
       data_root: tx.data_root,
-      data_size: tx.data_size,
+      offset: toLong(offset),
+      data_size: toLong(tx.data_size),
       data_tree: tx.data_tree || [],
       format: tx.format,
       tx_id: tx.id,
       last_tx: tx.last_tx,
       owner: tx.owner,
-      quantity: tx.quantity,
-      reward: tx.reward,
+      quantity: toLong(tx.quantity),
+      reward: toLong(tx.reward),
       signature: tx.signature,
       tags,
       tag_count: tags.length,
@@ -196,7 +199,7 @@ export const importTx = (txId: string, blockHash: string): TxReturnCode => {
 
 let workerIsWorking = false;
 
-export async function consumeQueueOnce(): void {
+export async function consumeQueueOnce(): Promise<void> {
   if (!workerIsWorking) {
     workerIsWorking = true;
     const result = await cassandraClient.execute(
@@ -238,7 +241,7 @@ export async function consumeQueueOnce(): void {
             try {
               await txQueueMapper.update({
                 tx_id: pendingTx.tx_id,
-                last_import_attempt: CassandraTypes.generateTimestamp(),
+                last_import_attempt: CassandraTypes.LocalTime.now(),
                 import_attempt_cnt: (pendingTx.import_attempt_cnt || 0) + 1,
               });
             } catch (error) {

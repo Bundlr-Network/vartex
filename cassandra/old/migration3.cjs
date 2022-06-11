@@ -520,7 +520,7 @@ module.exports = async (client) => {
 
         // until ans104 comes
         if (tagModelName != "TxGql" && !obj["data_item_index"]) {
-          obj["data_item_index"] = types.Long.fromNumber(0);
+          obj["data_item_index"] = types.Long.fromNumber(-1);
         }
 
         if (tagModelName === "TxGql") {

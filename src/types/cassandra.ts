@@ -60,5 +60,5 @@ export interface Transaction {
   signature: string;
   tags: CassandraTypes.Tuple[];
   tag_count: number;
-  target: number;
+  target: string;
 }

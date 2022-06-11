@@ -4,7 +4,6 @@
   "main": "dist/src/gateway",
   "repository": "git@github.com:ArweaveTeam/gateway.git",
   "author": "Arweave <hello@arweave.org>",
-  "type": "module",
   "license": "MIT",
   "engines": {
     "node": ">=16"
@@ -39,13 +38,18 @@
     "**/graphql": "16"
   },
   "dependencies": {
+    "@types/amqplib": "^0.8.2",
+    "@types/rascal": "^10.0.5",
+    "amqplib": "^0.10.0",
     "ansi-styles": "^6.1.0",
     "apollo-server-express": "^3.6.4",
     "arweave": "^1.10.23",
     "arweave-bundles": "^1.0.3",
     "base64-stream": "^1.0.0",
     "body-parser": "^1.19.2",
+    "bullmq": "^1.86.0",
     "cassandra-driver": "^4.6.3",
+    "celery-node": "^0.5.9",
     "colors": "^1.4.0",
     "commander": "^9.1.0",
     "cors": "^2.8.5",
@@ -80,6 +84,7 @@
     "rambda": "^7.0.3",
     "ramda": "^0.28.0",
     "random-weighted-choice": "^0.1.4",
+    "rascal": "^14.4.4",
     "rfc4648": "^1.5.1",
     "rimraf": "^3.0.2",
     "shortid": "^2.2.16",
@@ -102,7 +107,7 @@
     "@types/mkdirp": "^1.0.2",
     "@types/mocha": "^9.1.0",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^17.0.21",
+    "@types/node": "^17.0.42",
     "@types/node-cron": "^3.0.1",
     "@types/ramda": "^0.28.1",
     "@types/shortid": "^0.0.29",

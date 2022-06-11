@@ -399,7 +399,7 @@ const insertGqlTag = async (tagsMapper, tx) => {
 
       // until ans104 comes
       if (!obj["data_item_index"]) {
-        obj["data_item_index"] = types.Long.fromNumber(0);
+        obj["data_item_index"] = types.Long.fromNumber(-1);
       }
       let index = 0;
       for (const tuple of tx.tags) {
