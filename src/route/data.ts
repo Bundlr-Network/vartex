@@ -132,7 +132,7 @@ export async function dataRoute(
   console.log(request.params);
   console.log(request.path);
 
-  if (!request.txid) {
+  if (!request.params.txid || request.params.txid.match(/[\w-]{43}/i)?.length === 0) {
     // sandbox-mode
     if (request.params["0"]) {
       firstPath = request.params["0"];
