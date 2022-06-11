@@ -11,7 +11,6 @@ config();
 
 let temporaryNodes = [];
 try {
-  console.log()
   temporaryNodes = process.env.ARWEAVE_NODES
     ? JSON.parse(process.env.ARWEAVE_NODES)
     : ["http://lon-4.eu-west-1.arweave.net:1984"];
