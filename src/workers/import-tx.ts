@@ -47,7 +47,7 @@ const queue = new PQueue({ concurrency });
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
 export const insertGqlTag = async (
-  tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long }
+  tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long, tx_id: string }
 ): Promise<void> => {
   if (!R.isEmpty(tx.tags)) {
     for (const tagModelName of Object.keys(tagModels)) {
@@ -74,7 +74,7 @@ export const insertGqlTag = async (
 
         const insertObject = R.merge(environment, {
           tag_pair: `${tag_name}|${tag_value}`,
-          tag_index: index,
+          tag_index: index
         });
 
         await tagMapper.insert(insertObject);
@@ -174,7 +174,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 
   try {
     console.log(`Inserting gql tags for ${txId}...`);
-    await insertGqlTag({ ...tx, tx_index: txIndex });
+    await insertGqlTag({ ...tx, tx_index: txIndex, tx_id: tx.id });
   } catch (error) {
     log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
