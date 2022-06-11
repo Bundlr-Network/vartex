@@ -3,7 +3,7 @@ import PQueue from "p-queue";
 import { types as CassandraTypes } from "cassandra-driver";
 import { MessagesFromParent, MessagesFromWorker } from "./message-types";
 import { UpstreamTag } from "../types/cassandra";
-import {getTransaction, getTxOffset, TransactionType} from "../query/transaction";
+import { getTransaction, getTxOffset, TransactionType } from "../query/transaction";
 import { ownerToAddress } from "../utility/encoding";
 import {
   cassandraClient,
@@ -12,11 +12,11 @@ import {
   transactionMapper,
   txQueueMapper,
 } from "../database/mapper";
-import {insertTx, toLong} from "../database/utils";
+import { insertTx, toLong } from "../database/utils";
 import { getMessenger } from "../gatsby-worker/child";
 import { mkWorkerLog } from "../utility/log";
 import { env, KEYSPACE } from "../constants";
-import {tagModels} from "../database/tags-mapper";
+import { tagModels } from "../database/tags-mapper";
 
 enum TxReturnCode {
   OK,
@@ -82,6 +82,7 @@ export const insertGqlTag = async (
 };
 
 export const importTx = async (txId: string, blockHash: string): Promise<TxReturnCode> => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const block = await blockMapper({ indep_hash: blockHash });
 
