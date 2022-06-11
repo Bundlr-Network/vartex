@@ -18,8 +18,7 @@ import { mkWorkerLog } from "../utility/log";
 import { env, KEYSPACE } from "../constants";
 import { tagModels } from "../database/tags-mapper";
 import * as MQ from "bullmq";
-import {ImportTxJob, importTxQueue} from "../queue";
-import {loggers} from "winston";
+import { ImportTxJob, importTxQueue } from "../queue";
 
 enum TxReturnCode {
   OK,
@@ -47,7 +46,7 @@ const queue = new PQueue({ concurrency });
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
 export const insertGqlTag = async (
-  tx: TransactionType
+  tx: Omit<TransactionType, 'data'>
 ): Promise<void> => {
   if (!R.isEmpty(tx.tags)) {
     for (const tagModelName of Object.keys(tagModels)) {
@@ -87,7 +86,7 @@ export const insertGqlTag = async (
 export const importTx = async (txId: string, blockHash: string): Promise<TxReturnCode> => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const block = await blockMapper({ indep_hash: blockHash });
+  const block = await blockMapper.get({ indep_hash: blockHash });
 
   if (!block) {
     log(
