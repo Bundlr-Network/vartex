@@ -147,6 +147,11 @@ app.use(appendSlashMiddleware);
 
 export function start(): void {
 
+  app.use(((_, __, next) => {
+    console.log("Hello");
+    next();
+  }))
+
   app.set("trust proxy", 1);
   app.set("query parser", "simple");
 
