@@ -107,7 +107,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   }
 
   // check if it's already imported, or is attached to abandoned fork
-  const maybeImportedTx = await transactionMapper.get({ txId });
+  const maybeImportedTx = await transactionMapper.get({ tx_id: txId });
 
 
   if (maybeImportedTx) {
