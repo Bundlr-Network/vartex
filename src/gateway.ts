@@ -68,40 +68,40 @@ const dataPathRegex = new RegExp(/\/?[\w-]{43}/i);
 
 // 1. redirect domain.com/:txid -> txid.domain.org
 // 2. route txid.domain.org -> domain.com/:txid
-function permawebSandboxMiddleware(
-  request: Partial<Request & { txid?: string }>,
-  response: Response,
-  next: () => void
-) {
-  if (
-    request.subdomains &&
-    request.subdomains.length > 0 &&
-    /[\w-]{43}/.test(request.subdomains[0])
-  ) {
-    request.txid = request.subdomains[0];
-    dataRoute(request, response);
-    return;
-  } else if (
-    request.originalUrl.replace(/^\//, "").replace(/\/.*/, "").length === 43
-  ) {
-    const requestPath = request.originalUrl.replace(/^\//, "");
-    // const requestTxId = requestPath.replace(/\/.*/, "");
-    const requestSubPath = requestPath.replace(/.*\//, "");
-    const query = request.url.slice(request.path.length);
-    response.redirect(
-      302,
-      `${request.protocol}://${
-        request.host.endsWith(":80") || request.host.endsWith(":443")
-          ? request.hostname
-          : request.host
-      }/${requestSubPath}${query}`
-    );
-    return;
-  } else {
-    next && next();
-    return;
-  }
-}
+// function permawebSandboxMiddleware(
+//   request: Partial<Request & { txid?: string }>,
+//   response: Response,
+//   next: () => void
+// ) {
+//   if (
+//     request.subdomains &&
+//     request.subdomains.length > 0 &&
+//     /[\w-]{43}/.test(request.subdomains[0])
+//   ) {
+//     request.txid = request.subdomains[0];
+//     dataRoute(request, response);
+//     return;
+//   } else if (
+//     request.originalUrl.replace(/^\//, "").replace(/\/.*/, "").length === 43
+//   ) {
+//     const requestPath = request.originalUrl.replace(/^\//, "");
+//     // const requestTxId = requestPath.replace(/\/.*/, "");
+//     const requestSubPath = requestPath.replace(/.*\//, "");
+//     const query = request.url.slice(request.path.length);
+//     // response.redirect(
+//     //   302,
+//     //   `${request.protocol}://${
+//     //     request.host.endsWith(":80") || request.host.endsWith(":443")
+//     //       ? request.hostname
+//     //       : request.host
+//     //   }/${requestSubPath}${query}`
+//     // );
+//     return;
+//   } else {
+//     next && next();
+//     return;
+//   }
+// }
 
 // lack of slash causes permaweb apps to fetch from root domain.com/
 // and not domain.com/path/
@@ -141,7 +141,7 @@ function appendSlashMiddleware(
   }
 }
 
-app.use(permawebSandboxMiddleware);
+// app.use(permawebSandboxMiddleware);
 
 app.use(appendSlashMiddleware);
 
