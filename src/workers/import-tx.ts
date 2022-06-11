@@ -292,6 +292,7 @@ export async function consumeQueueOnce(): Promise<void> {
   const importTxScheduler = new MQ.QueueScheduler(importTxQueue.name);
 
   const worker = new MQ.Worker<ImportTxJob>(importTxQueue.name, async function (job) {
+    console.log(`Running Import Tx job - ${job.data.tx_id}`);
     try {
       await importTx(job.data.tx_id, job.data.block_hash);
     } catch (error) {
