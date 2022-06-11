@@ -202,6 +202,7 @@ export async function dataRoute(
 
   if (offset) {
     console.log(`Got offset - ${txId}`);
+    console.log(`txDatabase - ${txDatabase}`);
     console.log(`txUpstream - ${txUpstream}`);
     const tags = txUpstream
       ? txUpstream.tags.map(utf8DecodeTag)
