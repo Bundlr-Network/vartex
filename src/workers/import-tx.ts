@@ -281,7 +281,8 @@ export async function consumeQueueOnce(): Promise<void> {
     }
   });
   console.log(importTxScheduler.name);
+  console.log(worker.name);
 
   // await importTxScheduler.run();
-  await worker.run();
+  // await worker.run();
 })();
