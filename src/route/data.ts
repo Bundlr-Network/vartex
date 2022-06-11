@@ -143,6 +143,7 @@ export async function dataRoute(
   }
 
   if (!firstPath) {
+    console.log(`No firstPath - returning 404`);
     response.sendStatus(404);
     return;
   }
