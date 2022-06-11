@@ -64,7 +64,7 @@ app.use(poweredBy);
 
 // app.use(expressSlash());
 
-const dataPathRegex = new RegExp(/\/?[\w-]{43}/i);
+// const dataPathRegex = new RegExp(/\/?[\w-]{43}/i);
 
 // 1. redirect domain.com/:txid -> txid.domain.org
 // 2. route txid.domain.org -> domain.com/:txid
@@ -181,7 +181,6 @@ export function start(): void {
   app.post("/api", proxyPostRoute);
   app.get(/\/price.*/, proxyGetRoute);
   app.get(/\/wallet.*/, proxyGetRoute);
-  app.get(dataPathRegex, dataRoute);
   // graphql endpoints
   const graphqlServer = graphServer({ introspection: true });
   graphqlServer.start().then(() => {
@@ -228,6 +227,8 @@ export function start(): void {
       endpoint: "/graphql",
     })
   );
+
+  app.get("/:txid", dataRoute);
 
   app.listen(env.PORT || 1248, () => {
     log.info(`[app] Started on http://localhost:${env.PORT || 1248}`);

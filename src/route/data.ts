@@ -128,6 +128,7 @@ export async function dataRoute(
   let firstPath: string;
   let subPath: string;
 
+  console.log(request.txid);
   console.log(request.params);
   console.log(request.path);
 
