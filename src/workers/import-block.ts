@@ -11,6 +11,7 @@ import {
 import { toLong } from "../database/utils";
 import { getMessenger } from "../gatsby-worker/child";
 import { mkWorkerLog } from "../utility/log";
+import {importTxQueue} from "../queue";
 
 let messenger = getMessenger<MessagesFromParent, MessagesFromWorker>();
 
@@ -43,13 +44,14 @@ export async function importBlock(
     return BlockImportReturnCode.REQUEUE;
   }
 
+
+
   if (Array.isArray(newBlock.txs)) {
     for (const txId of newBlock.txs) {
-      await txQueueMapper.insert({
+      await importTxQueue.add("Import tx",{
         tx_id: txId,
         block_hash: newBlock.indep_hash,
         block_height: height,
-        import_attempt_cnt: 0,
       });
     }
   }

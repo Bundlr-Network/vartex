@@ -1,6 +1,5 @@
 import * as R from "rambda";
 import { remove } from "ramda";
-import megaTagPairs from "../../static/mega-tagpairs.json" assert {type: "json"}
 import { cassandraClient } from "../database/cassandra";
 import { toLong } from "../database/utils";
 import { types as CassandraTypes } from "cassandra-driver";
@@ -8,6 +7,9 @@ import { TxSearchResult } from "./resolver-types";
 import { QueryTransactionsArgs as QueryTransactionsArguments } from "./types.graphql";
 import { toB64url } from "../query/transaction";
 import { KEYSPACE } from "../constants";
+import * as fs from "node:fs";
+
+const megaTagPairs = JSON.parse(fs.readFileSync("../../static/mega-tagpairs.json").toString());
 
 const megaTagPairsList = Object.values(megaTagPairs);
 

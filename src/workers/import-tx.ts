@@ -17,6 +17,9 @@ import { getMessenger } from "../gatsby-worker/child";
 import { mkWorkerLog } from "../utility/log";
 import { env, KEYSPACE } from "../constants";
 import { tagModels } from "../database/tags-mapper";
+import * as MQ from "bullmq";
+import {ImportTxJob, importTxQueue} from "../queue";
+import {loggers} from "winston";
 
 enum TxReturnCode {
   OK,
@@ -265,3 +268,19 @@ export async function consumeQueueOnce(): Promise<void> {
     log(`Can't consume queue while worker is still consuming`);
   }
 }
+
+
+(async function () {
+  const importTxScheduler = new MQ.QueueScheduler(importTxQueue.name);
+
+  const worker = new MQ.Worker<ImportTxJob>(importTxQueue.name, async function(job) {
+    try {
+      await importTx(job.data.tx_id, job.data.block_hash);
+    } catch (error) {
+      console.error(`Error occurred while importing tx - ${error}`);
+    }
+  });
+
+  await importTxScheduler.run();
+  await worker.run();
+})();
