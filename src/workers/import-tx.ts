@@ -66,7 +66,7 @@ export const insertGqlTag = async (
         environment.owner.length > 43
       ) {
         environment.owner = ownerToAddress(environment.owner);
-        environment.bundled_in ??= "";
+        environment.bundled_in ??= "hi";
       }
 
       let index = 0;
@@ -77,6 +77,8 @@ export const insertGqlTag = async (
           tag_pair: `${tag_name}|${tag_value}`,
           tag_index: index
         });
+
+        console.log(insertObject);
 
         await tagMapper.insert(insertObject);
         index += 1;
