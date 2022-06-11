@@ -123,6 +123,7 @@ export async function dataRoute(
   request: Partial<Request & { txid?: string }>,
   response: Response
 ): Promise<void> {
+  console.log("HIT");
 
   let firstPath: string;
   let subPath: string;
