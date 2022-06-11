@@ -4,6 +4,7 @@
   "main": "dist/src/gateway",
   "repository": "git@github.com:ArweaveTeam/gateway.git",
   "author": "Arweave <hello@arweave.org>",
+  "type": "module",
   "license": "MIT",
   "engines": {
     "node": ">=16"
@@ -14,9 +15,6 @@
   "prettier": {
     "singleQuote": false,
     "doubleQuote": true
-  },
-  "execMap": {
-    "ts": "node --loader ts-node/esm"
   },
   "exports": {
     ".": "./cli/vartex.mjs"
@@ -31,14 +29,18 @@
     "start:prod": "yarn run prestart && node start.mjs",
     "cache:purge": "rm -rf cache/imports",
     "migrate:init": "node cassandra/init.cjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build": "TSC_COMPILE_ON_ERROR=true tsc"
+  },
+  "execMap": {
+    "ts": "node --loader ts-node/esm"
   },
   "resolutions": {
     "cassandra-driver/long": "^4.0.0",
     "**/graphql": "16"
   },
   "dependencies": {
-    "@types/amqplib": "^0.8.2",
+    "@types/p-queue": "^3.2.1",
     "@types/rascal": "^10.0.5",
     "amqplib": "^0.10.0",
     "ansi-styles": "^6.1.0",
