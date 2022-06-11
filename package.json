@@ -5,6 +5,7 @@
   "repository": "git@github.com:ArweaveTeam/gateway.git",
   "author": "Arweave <hello@arweave.org>",
   "license": "MIT",
+  "type": "module",
   "engines": {
     "node": ">=16"
   },

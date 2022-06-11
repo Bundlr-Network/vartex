@@ -3,7 +3,7 @@
     "target": "ESNext",
     "lib": ["es2021"],
     "baseUrl": ".",
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSources": true,

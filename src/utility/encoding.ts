@@ -1,4 +1,4 @@
-// import Ar from "arweave/node/ar";
+import Ar from "arweave/node/ar";
 import { types as CassandraTypes } from "cassandra-driver";
 import * as B64js from "base64-js";
 import { base32 } from "rfc4648";
@@ -7,9 +7,8 @@ import { Readable, PassThrough, Transform } from "node:stream";
 import { Tag } from "../types/arweave";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const ar = new ((Ar as any).default as typeof Ar)();
-import Ar from "arweave/node/ar";
-const ar = new Ar()
+const ar = new ((Ar as any).default as typeof Ar)();
+
 
 export type Base64EncodedString = string;
 export type Base64UrlEncodedString = string;
