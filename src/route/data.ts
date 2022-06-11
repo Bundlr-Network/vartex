@@ -192,6 +192,8 @@ export async function dataRoute(
     }
   }
 
+  txDatabase.tags ??= [];
+
   let offset = await txOffsetMapper.get({ tx_id: txId });
 
   if (!offset) {
