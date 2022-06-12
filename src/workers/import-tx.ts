@@ -19,6 +19,7 @@ import { env, KEYSPACE } from "../constants";
 import { tagModels } from "../database/tags-mapper";
 import * as MQ from "bullmq";
 import { ImportTxJob, importTxQueue } from "../queue";
+import Transaction from "arweave/node/lib/transaction";
 
 
 enum TxReturnCode {
@@ -290,12 +291,47 @@ export async function consumeQueueOnce(): Promise<void> {
 (async function () {
   const importTxScheduler = new MQ.QueueScheduler(importTxQueue.name);
 
-  const worker = new MQ.Worker<ImportTxJob>(importTxQueue.name, async function (job) {
-    console.log(`Running Import Tx job - ${job.data.tx_id}`);
-    try {
-      await importTx(job.data.tx_id, job.data.block_hash);
-    } catch (error) {
-      console.error(`Error occurred while importing tx - ${error}`);
+  const worker = new MQ.Worker<ImportTxJob | Omit<Transaction, 'data'>>(importTxQueue.name, async function (job) {
+    switch (job.name) {
+      case "Import Tx": {
+        console.log(`Running Import Tx job - ${job.data.tx_id}`);
+        try {
+          await importTx(job.data.tx_id, job.data.block_hash);
+        } catch (error) {
+          console.error(`Error occurred while importing tx - ${error}`);
+        }
+        break;
+      }
+      case "Import Pending Tx": {
+        const minusOne = toLong(-1);
+        const tx = job.data as Transaction;
+        await insertTx({
+          tx_index: minusOne,
+          data_item_index: minusOne,
+          block_height: minusOne,
+          block_hash: "PENDING",
+          bundled_in: null /* eslint-disable-line unicorn/no-null */,
+          data_root: tx.data_root,
+          offset: minusOne,
+          data_size: toLong(tx.data_size),
+          data_tree: tx.data_tree || [],
+          format: tx.format,
+          tx_id: tx.id,
+          last_tx: tx.last_tx,
+          owner: tx.owner,
+          quantity: toLong(tx.quantity),
+          reward: toLong(tx.reward),
+          signature: tx.signature,
+          tags: tx.tags.map(t => CassandraTypes.Tuple.fromArray([t.name, t.value])),
+          tag_count: tx.tags.length,
+          target: tx.target,
+        });
+        break;
+      }
+      default: {
+        console.error(`Invalid job put in queue - ${job.name}`);
+        throw new Error(`Invalid job put in queue - ${job.name}`);
+      }
     }
   });
   console.log(importTxScheduler.name);

@@ -6,6 +6,7 @@ import { grabNode } from "../query/node";
 import Transaction from "arweave/node/lib/transaction";
 import { types } from "cassandra-driver";
 import Tuple = types.Tuple;
+import { importTxQueue } from "../queue";
 
 export async function txUploadRoute(
   request: Request,
@@ -52,6 +53,13 @@ export async function txUploadRoute(
           })
       );
     }
+
+    delete tx.data;
+    await importTxQueue.add("Import Pending Tx", {
+      ...tx
+    }, {
+      delay: 2000
+    });
 
     response.sendStatus(200).end();
   } catch (error) {
