@@ -207,11 +207,6 @@ export const findTxIDsFromTxFilters = async (
   } else if (isBucketSearchTx) table = sortOrder === "HEIGHT_ASC" ? "txs_sorted_asc" : "txs_sorted_desc";
   else table = filtersToTable[sortOrder][tableKey];
 
-  if (isBucketSearchTag && txFilterKeys.length > 0) t += "_by";
-
-
-
-
   console.log(`table ${table}`);
   
   const cursorQuery =
