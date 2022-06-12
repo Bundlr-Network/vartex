@@ -61,10 +61,13 @@ export const insertTx = async (
     }
 
     console.log(`Importing tx ${tx.tx_id} into several tables`);
-    for (const txModelName of Object.keys(txModels)) {
+    for (const [txModelName, fields] of Object.entries(txModels)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (fields.some(v => tx[v] && tx[v] !== "")) continue;
       const txxMapper = txMapper.forModel(txModelName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
-      const allFields: any = R.concat(commonFields, txModels[txModelName]);
+      const allFields: any = R.concat(commonFields, fields);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const environment: any = R.pickAll(allFields, tx);
 
@@ -86,9 +89,16 @@ export const insertTx = async (
       const tags = tx.tags.map(t => t.elements.join("|"));
       console.log(tags)
       console.log("About to insert");
+      console.log(R.merge(environment, {
+        tag_pairs: tags
+      }), undefined, {
+        logged: true
+      });
       await txxMapper.insert(R.merge(environment, {
         tag_pairs: tags
-      }))
+      }), undefined, {
+        logged: true
+      })
       console.log("INSERTED!!");
     }
   } catch (error) {

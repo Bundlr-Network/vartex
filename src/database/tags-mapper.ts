@@ -6,6 +6,7 @@ const { Mapper } = mapping;
 export const txModels: Record<string, string[]> = {
   Owner: ["owner"],
   Target: ["target"]
+  // OwnerAndTarget: ["owner", "target"]
 };
 
 export const tagModels: Record<string, string[]> = {
