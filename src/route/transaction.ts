@@ -22,6 +22,8 @@ export async function txUploadRoute(
 
     const host = grabNode();
 
+    console.log(`${host}/tx`);
+
     const result = await got.post(`${host}/tx`, {
       followRedirect: true,
       json: request.body,
