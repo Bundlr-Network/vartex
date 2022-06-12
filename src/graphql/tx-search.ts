@@ -64,6 +64,7 @@ const filtersToTable: { [direction: string]: Record<string, string> } = {
     bundledIn: "tx_gql_by_bundled_in_asc",
     target: "tx_gql_by_target_asc",
     owners: "tx_gql_by_owner_asc",
+    ids: "tx_gql_by_tx_id_asc"
   },
   HEIGHT_DESC: {
     bundledIn_dataRoots_ids_owners_target:
@@ -100,6 +101,7 @@ const filtersToTable: { [direction: string]: Record<string, string> } = {
     bundledIn: "tx_gql_by_bundled_in_desc",
     target: "tx_gql_by_target_desc",
     owners: "tx_gql_by_owner_desc",
+    ids: "tx_gql_by_tx_id_desc"
   },
 };
 
@@ -151,9 +153,9 @@ function encodeCursor({
   return Buffer.from(string).toString("base64url");
 }
 
-const filterToColumn: Record<string, string> = {
-  "ids": "tx_id"
-};
+// const filterToColumn: Record<string, string> = {
+//   "ids": "tx_id"
+// };
 
 function parseTxFilterCursor(cursor: string): TxFilterCursor {
   try {
@@ -196,7 +198,7 @@ export const findTxIDsFromTxFilters = async (
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
-  let t = isBucketSearchTag
+  const table = isBucketSearchTag
     ? "tx_tag_gql"
     : isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
@@ -206,11 +208,11 @@ export const findTxIDsFromTxFilters = async (
 
   if (isBucketSearchTag && txFilterKeys.length > 0) t += "_by";
 
-  console.log(txFilterKeys);
-  console.log(t);
+  // console.log(txFilterKeys);
+  // console.log(t);
 
-  const table = txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
-      + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
+  // const table = txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
+  //     + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
 
   console.log(`table ${table}`);
   
