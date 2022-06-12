@@ -294,6 +294,8 @@ export const findTxIDsFromTxFilters = async (
           tags: "tag_pairs",
         });
 
+
+
         if (cqlKey === "tag_pairs") {
           const whereValsString = tagPairs
             .map((tp) => `AND tag_pairs CONTAINS ${tp}`)
@@ -358,6 +360,8 @@ export const findTxIDsFromTxFilters = async (
 
       const whereQuery = isBucketSearchTag
         ? tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ")
+        : queryParameters.ids?.length > 0
+        ? `AND tx_id IN ${JSON.stringify(queryParameters.ids)}`
         : "";
 
       console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
