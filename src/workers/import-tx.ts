@@ -303,6 +303,7 @@ export async function consumeQueueOnce(): Promise<void> {
         break;
       }
       case "Import Pending Tx": {
+        console.log("Importing pending tx");
         const minusOne = toLong(-1);
         const tx = job.data as Transaction;
         await insertTx({
