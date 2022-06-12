@@ -198,9 +198,7 @@ export const findTxIDsFromTxFilters = async (
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
-  const table = isBucketSearchTag
-    ? "tx_tag_gql"
-    : isBucketSearchTx
+  const table = isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
         ? "txs_sorted_asc"
         : "txs_sorted_desc"
