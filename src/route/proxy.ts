@@ -18,7 +18,7 @@ export function proxyGetRoute(request: Request, response: Response): void {
   stream.pipe(response);
 }
 
-export async function proxyPostRoute(request: Request, response: Response): void {
+export async function proxyPostRoute(request: Request, response: Response): Promise<void> {
   const uri = `${grabNode()}${request.originalUrl}`;
   try {
     const stream = await undici.request(uri, {
