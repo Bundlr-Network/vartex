@@ -158,10 +158,22 @@ export const resolvers = {
       // const tagSearchMode =
       //   queryParameters.tags && !R.isEmpty(queryParameters.tags);
 
-      const [txSearchResult, hasNextPage] = await findTxIDsFromTxFilters(
-        maxHeightBlock[1],
-        queryParameters
-      );
+      let txSearchResult, hasNextPage;
+      try {
+        const res = await findTxIDsFromTxFilters(
+            maxHeightBlock[1],
+            queryParameters
+        );
+
+        txSearchResult = res[0];
+        hasNextPage = res[1];
+      } catch (error) {
+        console.error(`Error occurred while getting transactions results - ${error}`)
+      }
+      // [txSearchResult, hasNextPage] = await findTxIDsFromTxFilters(
+      //   maxHeightBlock[1],
+      //   queryParameters
+      // );
       // const [txSearchResult, hasNextPage] = tagSearchMode
       //   ? await findTxIDsFromTagFilters(maxHeightBlock[1], queryParameters)
       //   : await findTxIDsFromTxFilters(maxHeightBlock[1], queryParameters);
