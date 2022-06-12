@@ -83,7 +83,7 @@ export const insertTx = async (
 
       environment.bundled_in ??= "";
 
-
+      await txxMapper.insert(environment)
     }
   } catch (error) {
     console.error(error);
