@@ -194,8 +194,8 @@ export const findTxIDsFromTxFilters = async (
 
   const table = isBucketSearchTag
     ? sortOrder === "HEIGHT_ASC"
-      ? "tx_gql_tags_asc"
-      : "tx_gql_tags_desc"
+      ? "tx_tag_gql_by_tx_id_asc"
+      : "tx_tag_gql_by_tx_id_desc"
     : isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
         ? "txs_sorted_asc"
