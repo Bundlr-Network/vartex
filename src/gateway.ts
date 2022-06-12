@@ -175,6 +175,8 @@ export function start(): void {
   app.use("/tx/:id/status", proxyGetRoute);
   app.get("/tx/:id", txGetByIdRoute);
 
+  app.get("/chunk/:offset", proxyGetRoute)
+
   app.get("/peers", proxyGetRoute);
   app.get("/tx_anchor", proxyGetRoute);
 
