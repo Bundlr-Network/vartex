@@ -270,8 +270,10 @@ export const findTxIDsFromTxFilters = async (
     ? txFilterKeys
     : R.append("tags", txFilterKeys);
 
+  console.log(txFilterKeys)
+
   const whereClause =
-    isBucketSearchTag || isBucketSearchTx
+    (isBucketSearchTag || isBucketSearchTx)
       ? ""
       : txFilterKeys_.reduce((accumulator, key) => {
         const k_ =
@@ -292,7 +294,7 @@ export const findTxIDsFromTxFilters = async (
           tags: "tag_pairs",
         });
 
-          console.log(`whereClause ${whereClause}`);
+        console.log(`whereClause ${whereClause}`);
 
         if (cqlKey === "tag_pairs") {
           const whereValsString = tagPairs
