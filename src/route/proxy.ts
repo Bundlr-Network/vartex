@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { grabNode } from "../query/node";
 import got from "got";
-import * as undici from "undici";
-// import axios from "axios";
+// import * as undici from "undici";
+import axios from "axios";
 
 export function proxyGetRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
@@ -29,12 +29,10 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
       headers: request.headers
     });
 
-    console.log(request.body);
+    const stream = await axios.post(uri, request.body, { headers: request.headers as Record<string, string>, responseType: "stream" });
 
-    const stream = await undici.request(uri, { method: "POST", body: request.body, headers: request.headers });
-
-    stream.body.on("error", console.error);
-    stream.body.pipe(response);
+    stream.data.on("error", console.error);
+    stream.data.pipe(response);
   } catch (error) {
     console.error(`Error occurred while piping chunks to ${uri} - ${error}`);
   }
