@@ -417,7 +417,7 @@ export const findTxIDsFromTxFilters = async (
     } ALLOW FILTERING`)
 
     const txFilterQ = await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} LIMIT ${limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`
     );
 
