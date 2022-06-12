@@ -60,7 +60,7 @@ export const insertTx = async (
       console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
     }
 
-    console.log(`Importing tags from ${tx.tx_id} - ${JSON.stringify(tx.tags, undefined, 4)}`);
+    console.log(`Importing tx ${tx.tx_id} into several tables`);
     for (const txModelName of Object.keys(txModels)) {
       const txxMapper = txMapper.forModel(txModelName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread

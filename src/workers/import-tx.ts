@@ -58,9 +58,6 @@ export const insertGqlTag = async (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const environment: any = R.pickAll(allFields, tx);
 
-      console.log(`Mapper - ${tagMapper.name}`);
-      console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
-
       // until ans104 comes
       environment.data_item_index ??= toLong(-1);
 
