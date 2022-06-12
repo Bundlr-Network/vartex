@@ -294,8 +294,6 @@ export const findTxIDsFromTxFilters = async (
           tags: "tag_pairs",
         });
 
-        console.log(`whereClause ${whereClause}`);
-
         if (cqlKey === "tag_pairs") {
           const whereValsString = tagPairs
             .map((tp) => `AND tag_pairs CONTAINS ${tp}`)
@@ -310,6 +308,9 @@ export const findTxIDsFromTxFilters = async (
           return `${accumulator} AND ${cqlKey} ${whereValsString}`;
         }
       }, "");
+
+  console.log(`whereClause ${whereClause}`);
+
 
   let hasNextPage = false;
   let txsFilterRows = [];
