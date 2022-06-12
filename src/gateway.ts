@@ -157,6 +157,7 @@ export function start(): void {
     limit: "12mb"
   });
   const rawBodyParser = bodyParser.raw({
+    type: "application/json",
     limit: "12mb"
   });
 
