@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { grabNode } from "../query/node";
 import got from "got";
+import * as undici from "undici";
 
 export function proxyGetRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
@@ -19,9 +20,10 @@ export function proxyGetRoute(request: Request, response: Response): void {
 
 export function proxyPostRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
-  const stream = got.stream.post(uri, {
+  const stream = undici.fetch(uri, {
+    method: "POST",
     body: request,
-    // headers: request.headers
+    headers: request.headers
   });
   stream.on("error", (error) => {
     console.log(error);
