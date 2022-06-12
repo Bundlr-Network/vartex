@@ -4,6 +4,8 @@ import got from "got";
 import { transactionMapper, txOffsetMapper } from "../database/mapper";
 import { grabNode } from "../query/node";
 import Transaction from "arweave/node/lib/transaction";
+import { types } from "cassandra-driver";
+import Tuple = types.Tuple;
 
 export async function txUploadRoute(
   request: Request,
@@ -71,8 +73,10 @@ export async function txGetByIdRoute(
     console.log(rawTx)
     if (!rawTx) {
       response.sendStatus(404).end();
-      return;
+      return
     }
+
+    rawTx.tags = (rawTx.tags as Tuple)?.elements.map(e => ({ name: e[0], value: e[1] }));
     response.json(R.pipe(R.dissoc("tag_count"), R.dissoc("tx_index"))(rawTx));
   } catch (error) {
     next(error);
