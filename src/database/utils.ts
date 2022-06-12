@@ -62,7 +62,7 @@ export const insertTx = async (
 
     console.log(`Importing tx ${tx.tx_id} into several tables`);
     for (const [txModelName, fields] of Object.entries(txModels)) {
-      console.log(fields);
+      // console.log(fields);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (fields.some(v => !tx[v] || tx[v] === "")) continue;
@@ -72,8 +72,8 @@ export const insertTx = async (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const environment: any = R.pickAll(allFields, tx);
 
-      console.log(`Mapper - ${txxMapper.name}`);
-      console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
+      // console.log(`Mapper - ${txxMapper.name}`);
+      // console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
 
       // until ans104 comes
       environment.data_item_index ??= toLong(-1);
@@ -88,19 +88,19 @@ export const insertTx = async (
       environment.bundled_in ??= "";
 
       const tags = tx.tags.map(t => t.elements.join("|"));
-      console.log(tags)
-      console.log("About to insert");
-      console.log(R.merge(environment, {
-        tag_pairs: tags
-      }), undefined, {
-        logged: true
-      });
+      // console.log(tags)
+      // console.log("About to insert");
+      // console.log(R.merge(environment, {
+      //   tag_pairs: tags
+      // }), undefined, {
+      //   logged: true
+      // });
       await txxMapper.insert(R.merge(environment, {
         tag_pairs: tags
       }), undefined, {
         logged: true
       })
-      console.log("INSERTED!!");
+      // console.log("INSERTED!!");
     }
   } catch (error) {
     console.error(error);
