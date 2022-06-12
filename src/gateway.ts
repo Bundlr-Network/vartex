@@ -153,7 +153,9 @@ export function start(): void {
     next();
   }))
 
-  const jsonBodyParser = bodyParser.json();
+  const jsonBodyParser = bodyParser.json({
+    limit: "12mb"
+  });
 
   app.set("trust proxy", 1);
   app.set("query parser", "simple");
