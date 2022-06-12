@@ -151,6 +151,10 @@ function encodeCursor({
   return Buffer.from(string).toString("base64url");
 }
 
+const filterToColumn: Record<string, string> = {
+  "ids": "tx_id"
+};
+
 function parseTxFilterCursor(cursor: string): TxFilterCursor {
   try {
     const [cursorType, sortOrder, txIndex, dataItemIndex, nthBucket] =
@@ -192,16 +196,21 @@ export const findTxIDsFromTxFilters = async (
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
-  const table = isBucketSearchTag
+  const t = isBucketSearchTag
     ? sortOrder === "HEIGHT_ASC"
-      ? "tx_tag_gql_by_tx_id_asc"
-      : "tx_tag_gql_by_tx_id_desc"
+      ? "tx_tag_gql_by_"
+      : "tx_tag_gql_by_"
     : isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
         ? "txs_sorted_asc"
         : "txs_sorted_desc"
       : filtersToTable[sortOrder][tableKey];
 
+  const table = txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
+      + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
+
+  console.log(`table ${table}`);
+  
   const cursorQuery =
     queryParameters.after &&
     typeof queryParameters.after === "string" &&
@@ -360,8 +369,6 @@ export const findTxIDsFromTxFilters = async (
 
       const whereQuery = isBucketSearchTag
         ? tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ")
-        : queryParameters.ids?.length > 0
-        ? `AND tx_id IN ${JSON.stringify(queryParameters.ids)}`
         : "";
 
       console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1

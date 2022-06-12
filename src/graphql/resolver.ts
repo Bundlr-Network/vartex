@@ -155,6 +155,7 @@ export const resolvers = {
       const fieldsWithSubFields = graphqlFields(info);
       const wantsBlock = R.hasPath("edges.node.block", fieldsWithSubFields);
 
+
       // const tagSearchMode =
       //   queryParameters.tags && !R.isEmpty(queryParameters.tags);
 
