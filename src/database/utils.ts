@@ -83,7 +83,8 @@ export const insertTx = async (
 
       environment.bundled_in ??= "";
 
-      const tags = tx.tags.join("|");
+      const tags = tx.tags.map(t => t.elements.join("|"));
+      console.log(tags)
       console.log("About to insert");
       await txxMapper.insert(R.merge(environment, {
         tag_pairs: tags
