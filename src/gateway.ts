@@ -156,6 +156,9 @@ export function start(): void {
   const jsonBodyParser = bodyParser.json({
     limit: "12mb"
   });
+  const rawBodyParser = bodyParser.raw({
+    limit: "12mb"
+  });
 
   app.set("trust proxy", 1);
   app.set("query parser", "simple");
@@ -180,7 +183,7 @@ export function start(): void {
   app.get("/block/current", blockCurrentRoute);
 
   app.post("/tx", jsonBodyParser, txUploadRoute);
-  app.post("/chunk", jsonBodyParser, proxyPostRoute);
+  app.post("/chunk", rawBodyParser, proxyPostRoute);
   app.post("/wallet", proxyPostRoute);
   app.post("/unsigned_tx", proxyPostRoute);
   app.post("/api", proxyPostRoute);
