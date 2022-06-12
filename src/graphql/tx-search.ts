@@ -197,6 +197,13 @@ export const findTxIDsFromTxFilters = async (
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
+  let table;
+  if (isBucketSearchTag) {
+    table = txFilterKeys.reduce((accumulator, currentValue) =>
+            `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, "tx_tag_gql")
+        + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
+  } else if (isBucketSearchTx) table = sortOrder === "HEIGHT_ASC" ? "txs_sorted_asc" : "txs_sorted_desc";
+  else table = filtersToTable[sortOrder][tableKey];
   let t = isBucketSearchTag
     ? "tx_tag_gql"
     : isBucketSearchTx
@@ -210,8 +217,7 @@ export const findTxIDsFromTxFilters = async (
   console.log(txFilterKeys);
   console.log(t);
 
-  const table = isBucketSearchTx ? t : txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
-      + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
+
 
   console.log(`table ${table}`);
   
