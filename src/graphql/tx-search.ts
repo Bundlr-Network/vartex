@@ -183,7 +183,7 @@ export const findTxIDsFromTxFilters = async (
   const sortOrder =
     queryParameters.sort === "HEIGHT_ASC" ? "HEIGHT_ASC" : "HEIGHT_DESC";
   const isBucketSearchTag = Boolean(
-    R.isEmpty(txFilterKeys) && !R.isEmpty(queryParameters.tags)
+    R.isEmpty(txFilterKeys.filter(i => i !== "ids")) && !R.isEmpty(queryParameters.tags)
   );
   const isBucketSearchTx = Boolean(
     (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags || [])
