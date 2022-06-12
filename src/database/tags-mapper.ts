@@ -3,6 +3,10 @@ import { KEYSPACE } from "../constants";
 
 const { Mapper } = mapping;
 
+export const txModels: Record<string, string[]> = {
+  Owner: ["owner"]
+};
+
 export const tagModels: Record<string, string[]> = {
   Tag: [],
   TagAndTxId: ["tx_id"],
@@ -68,6 +72,16 @@ export const tagModels: Record<string, string[]> = {
     "data_root",
   ],
 };
+
+export const makeTxMapper = (cassandraClient: CassandraClient): any =>
+    new Mapper(cassandraClient, {
+      models: {
+        Owner: {
+          keyspace: KEYSPACE,
+          tables: ["tx_gql_by_owner_asc", "tx_gql_by_owner_desc"]
+        }
+      }
+    })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const makeTagsMapper = (cassandraClient: CassandraClient): any =>

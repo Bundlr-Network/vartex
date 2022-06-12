@@ -1,7 +1,7 @@
 import * as R from "rambda";
 import { mapping } from "cassandra-driver";
 import { cassandraClient } from "./cassandra";
-import { makeTagsMapper } from "./tags-mapper";
+import { makeTagsMapper, makeTxMapper } from "./tags-mapper";
 import { KEYSPACE } from "../constants";
 
 const { Mapper } = mapping;
@@ -134,5 +134,7 @@ export const txOffsetMapper = mapper.forModel("TxOffset");
 export const txQueueMapper = mapper.forModel("TxQueue");
 
 export const tagsMapper = makeTagsMapper(cassandraClient);
+
+export const txMapper = makeTxMapper(cassandraClient);
 
 export { cassandraClient } from "./cassandra";

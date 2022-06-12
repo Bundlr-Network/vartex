@@ -5,7 +5,9 @@ import {
 } from "cassandra-driver";
 import { KEYSPACE } from "../constants";
 import { Transaction } from "../types/cassandra";
-import { transactionMapper, txOffsetMapper, txsSortedAscMapper, txsSortedDescMapper } from "./mapper";
+import { transactionMapper, txMapper, txOffsetMapper, txsSortedAscMapper, txsSortedDescMapper } from "./mapper";
+import { ownerToAddress } from "../utility/encoding";
+import { txModels } from "./tags-mapper";
 
 export const toLong = (
   anyValue: CassandraTypes.Long | number | string | undefined
@@ -39,6 +41,8 @@ export const getMaxHeightBlock = async (
   return lastMaxHeight;
 };
 
+const commonFields = ["tx_index", "data_item_index", "tx_id"];
+
 export const insertTx = async (
     tx: Transaction & { data_item_index?: CassandraTypes.Long, offset?: CassandraTypes.Long }
 ): Promise<void> => {
@@ -54,6 +58,32 @@ export const insertTx = async (
     if (data_item_index.eq(toLong(-1))) {
       await txOffsetMapper.insert({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
       console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
+    }
+
+    console.log(`Importing tags from ${tx.tx_id} - ${JSON.stringify(tx.tags, undefined, 4)}`);
+    for (const txModelName of Object.keys(txModels)) {
+      const txxMapper = txMapper.forModel(txModelName);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
+      const allFields: any = R.concat(commonFields, txModels[txModelName]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const environment: any = R.pickAll(allFields, tx);
+
+      console.log(`Mapper - ${txxMapper.name}`);
+      console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
+
+      // until ans104 comes
+      environment.data_item_index ??= toLong(-1);
+
+      if (
+          typeof environment.owner === "string" &&
+          environment.owner.length > 43
+      ) {
+        environment.owner = ownerToAddress(environment.owner);
+      }
+
+      environment.bundled_in ??= "";
+
+
     }
   } catch (error) {
     console.error(error);
