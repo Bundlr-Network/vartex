@@ -83,7 +83,9 @@ export const insertTx = async (
 
       environment.bundled_in ??= "";
 
-      await txxMapper.insert(environment)
+      await txxMapper.insert(R.merge(environment, {
+        tag_pairs: tx.tags
+      }))
     }
   } catch (error) {
     console.error(error);
