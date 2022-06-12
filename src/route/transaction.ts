@@ -11,6 +11,7 @@ export async function txUploadRoute(
   next: NextFunction
 ): Promise<void> {
   try {
+    console.log(request.body);
     const tx = request.body as Transaction;
     if (!tx) {
       console.log("No tx provided");

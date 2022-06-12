@@ -29,6 +29,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { importBundleQueue, importTxQueue } from "./queue";
+import bodyParser from "body-parser";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const { default: expressPlayground } = gpmeImport as any;
@@ -152,6 +153,8 @@ export function start(): void {
     next();
   }))
 
+  const jsonBodyParser = bodyParser.json();
+
   app.set("trust proxy", 1);
   app.set("query parser", "simple");
 
@@ -174,7 +177,7 @@ export function start(): void {
   app.get("/block/hash/:hash", blockByHashRoute);
   app.get("/block/current", blockCurrentRoute);
 
-  app.post("/tx", txUploadRoute);
+  app.post("/tx", jsonBodyParser, txUploadRoute);
   app.post("/chunk", proxyPostRoute);
   app.post("/wallet", proxyPostRoute);
   app.post("/unsigned_tx", proxyPostRoute);
