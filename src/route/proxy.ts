@@ -31,6 +31,7 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
 
     const stream = await axios.post(uri, request, { headers: request.headers as Record<string, string>, responseType: "stream" });
 
+    stream.data.on("error", console.error);
     stream.data.pipe(response);
   } catch (error) {
     console.error(`Error occurred while piping chunks to ${uri} - ${error}`);
