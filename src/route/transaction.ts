@@ -68,7 +68,7 @@ export async function txGetByIdRoute(
     const rawTx = await transactionMapper.get({
       tx_id: txId,
     });
-    if (!rawTx) response.status(404).end();
+    if (!rawTx) response.sendStatus(404).end();
     response.json(R.pipe(R.dissoc("tag_count"), R.dissoc("tx_index"))(rawTx));
   } catch (error) {
     next(error);
