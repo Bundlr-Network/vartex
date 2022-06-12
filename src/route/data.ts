@@ -20,6 +20,7 @@ import {
 } from "../query/transaction";
 import { forEachNode } from "../query/node";
 import { utf8DecodeTag, utf8DecodeTupleTag } from "../utility/encoding";
+import axios from "axios";
 
 class B64Transform extends Transform {
   protected iterLength: number;
@@ -187,6 +188,16 @@ export async function dataRoute(
       txUpstream = await getTransaction({ txId, retry: 2 });
     } catch {
       console.error(`tx ${txId} wasn't found`);
+
+      try {
+        const res = await axios.get(`${process.env.BUNDLR_NODE}/tx/${txId}/data`, { responseType: "stream" });
+
+        for (const [k, v] of Object.entries(res.headers))  response.header(k, v);
+        res.data.pipe(response);
+        response.end()
+        return;
+      } catch {}
+
       response.sendStatus(404);
       return;
     }

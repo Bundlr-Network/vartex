@@ -76,8 +76,6 @@ export async function txGetByIdRoute(
       return
     }
 
-    console.log((rawTx.tags as Array<Tuple>)[0]);
-
     rawTx.tags = (rawTx.tags as Array<Tuple>)?.map(e => ({ name: e.get(0), value: e.get(1) })) ?? [];
     response.json(R.pipe(R.dissoc("tag_count"), R.dissoc("tx_index"))(rawTx));
   } catch (error) {
