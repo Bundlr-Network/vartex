@@ -68,6 +68,7 @@ export async function txGetByIdRoute(
     const rawTx = await transactionMapper.get({
       tx_id: txId,
     });
+    console.log(rawTx)
     if (!rawTx) {
       response.sendStatus(404).end();
       return;
