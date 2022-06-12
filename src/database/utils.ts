@@ -62,9 +62,10 @@ export const insertTx = async (
 
     console.log(`Importing tx ${tx.tx_id} into several tables`);
     for (const [txModelName, fields] of Object.entries(txModels)) {
+      console.log(fields);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      if (fields.some(v => tx[v] && tx[v] !== "")) continue;
+      if (fields.some(v => !tx[v] || tx[v] === "")) continue;
       const txxMapper = txMapper.forModel(txModelName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
       const allFields: any = R.concat(commonFields, fields);
