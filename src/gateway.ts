@@ -178,7 +178,7 @@ export function start(): void {
   app.get("/block/current", blockCurrentRoute);
 
   app.post("/tx", jsonBodyParser, txUploadRoute);
-  app.post("/chunk", proxyPostRoute);
+  app.post("/chunk", jsonBodyParser, proxyPostRoute);
   app.post("/wallet", proxyPostRoute);
   app.post("/unsigned_tx", proxyPostRoute);
   app.post("/api", proxyPostRoute);
