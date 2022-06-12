@@ -206,6 +206,9 @@ export const findTxIDsFromTxFilters = async (
 
   if (isBucketSearchTag && txFilterKeys.length > 0) t += "_by";
 
+  console.log(txFilterKeys);
+  console.log(t);
+
   const table = txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
       + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
 
