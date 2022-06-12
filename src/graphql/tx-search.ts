@@ -196,15 +196,15 @@ export const findTxIDsFromTxFilters = async (
   console.log(`isBucketSearchTag ${isBucketSearchTag}`);
   console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
-  const t = isBucketSearchTag
-    ? sortOrder === "HEIGHT_ASC"
-      ? "tx_tag_gql_by"
-      : "tx_tag_gql_by"
+  let t = isBucketSearchTag
+    ? "tx_tag_gql"
     : isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
         ? "txs_sorted_asc"
         : "txs_sorted_desc"
       : filtersToTable[sortOrder][tableKey];
+
+  if (isBucketSearchTag && txFilterKeys.length === 0) t += "_by";
 
   const table = txFilterKeys.reduce((accumulator, currentValue) => `${accumulator}_${filterToColumn[currentValue] ?? currentValue}`, t)
       + (sortOrder === "HEIGHT_ASC" ? "_asc" : "_desc");
