@@ -54,7 +54,7 @@ export async function getTransaction({
     coolNode(tryNode);
     if (retry > 100) {
       console.error(
-        `getTransaction: Failed to get txId: " + txId + " after 100 retries - ${error}\n`
+        `getTransaction: Failed to get txId: ${txId} after 100 retries - ${error}\n`
       );
       return undefined;
       // process.exit(1);
