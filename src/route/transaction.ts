@@ -27,6 +27,9 @@ export async function txUploadRoute(
     const result = await got.post(`${host}/tx`, {
       followRedirect: true,
       json: request.body,
+      headers: {
+        "X-Network": request.headers["X-Network"]
+      }
     });
 
     if ([400, 410].includes(result.statusCode)) {
