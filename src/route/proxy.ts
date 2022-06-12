@@ -21,7 +21,7 @@ export function proxyPostRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
   const stream = got.stream.post(uri, {
     body: request,
-    headers: request.headers
+    // headers: request.headers
   });
   stream.on("error", (error) => {
     console.log(error);
