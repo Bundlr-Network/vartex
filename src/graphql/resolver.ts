@@ -168,7 +168,8 @@ export const resolvers = {
         txSearchResult = res[0];
         hasNextPage = res[1];
       } catch (error) {
-        console.error(`Error occurred while getting transactions results - ${error}`)
+        console.error(`Error occurred while getting transactions results - ${error}`);
+        throw error;
       }
       // [txSearchResult, hasNextPage] = await findTxIDsFromTxFilters(
       //   maxHeightBlock[1],
