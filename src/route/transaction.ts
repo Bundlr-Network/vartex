@@ -76,7 +76,7 @@ export async function txGetByIdRoute(
       return
     }
 
-    rawTx.tags = (rawTx.tags as Tuple)?.elements.map(e => ({ name: e[0], value: e[1] })) ?? [];
+    rawTx.tags = (rawTx.tags as Array<Tuple>)[0]?.elements.map(e => ({ name: e[0], value: e[1] })) ?? [];
     response.json(R.pipe(R.dissoc("tag_count"), R.dissoc("tx_index"))(rawTx));
   } catch (error) {
     next(error);
