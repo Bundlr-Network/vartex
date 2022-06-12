@@ -5,8 +5,8 @@ const { Mapper } = mapping;
 
 export const txModels: Record<string, string[]> = {
   Owner: ["owner"],
-  Target: ["target"]
-  // OwnerAndTarget: ["owner", "target"]
+  Target: ["target"],
+  OwnerAndTarget: ["owner", "target"]
 };
 
 export const tagModels: Record<string, string[]> = {
@@ -85,6 +85,10 @@ export const makeTxMapper = (cassandraClient: CassandraClient): any =>
         Target: {
           keyspace: KEYSPACE,
           tables: ["tx_gql_by_target_asc", "tx_gql_by_target_desc"]
+        },
+        OwnerAndTarget: {
+          keyspace: KEYSPACE,
+          tables: ["tx_gql_by_owner_target_asc", "tx_gql_by_owner_target_desc"]
         }
       }
     })
