@@ -51,6 +51,13 @@ export async function importBlock(
         tx_id: txId,
         block_hash: newBlock.indep_hash,
         block_height: height,
+      }, {
+        delay: 5000,
+        attempts: 5,
+        backoff: {
+          type: "exponential",
+          delay: 5000,
+        }
       });
     }
   }
