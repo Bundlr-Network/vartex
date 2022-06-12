@@ -12,6 +12,11 @@ export async function txUploadRoute(
 ): Promise<void> {
   try {
     const tx = request.body as Transaction;
+    if (!tx) {
+      console.log("No tx provided");
+      response.sendStatus(400).end();
+      return;
+    }
     console.log(`[new-tx] broadcast tx ${tx.id}`);
 
     const host = grabNode();
