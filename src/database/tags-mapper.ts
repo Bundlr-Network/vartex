@@ -4,7 +4,8 @@ import { KEYSPACE } from "../constants";
 const { Mapper } = mapping;
 
 export const txModels: Record<string, string[]> = {
-  Owner: ["owner"]
+  Owner: ["owner"],
+  Target: ["target"]
 };
 
 export const tagModels: Record<string, string[]> = {
@@ -79,6 +80,10 @@ export const makeTxMapper = (cassandraClient: CassandraClient): any =>
         Owner: {
           keyspace: KEYSPACE,
           tables: ["tx_gql_by_owner_asc", "tx_gql_by_owner_desc"]
+        },
+        Target: {
+          keyspace: KEYSPACE,
+          tables: ["tx_gql_by_target_asc", "tx_gql_by_target_desc"]
         }
       }
     })
