@@ -50,12 +50,16 @@ export const insertGqlTag = async (
   tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long, tx_id: string }
 ): Promise<void> => {
   if (!R.isEmpty(tx.tags)) {
+    console.log(`Importing tags from ${tx.tx_id} - ${JSON.stringify(tx.tags, undefined, 4)}`);
     for (const tagModelName of Object.keys(tagModels)) {
       const tagMapper = tagsMapper.forModel(tagModelName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
       const allFields: any = R.concat(commonFields, tagModels[tagModelName]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const environment: any = R.pickAll(allFields, tx);
+
+      console.log(tagMapper);
+      console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
 
       // until ans104 comes
       if (!environment["data_item_index"]) {
@@ -81,8 +85,7 @@ export const insertGqlTag = async (
           tag_index: index
         });
 
-        console.log(insertObject);
-        console.log(`insertObject ${insertObject}`);
+        console.log(`insertObject ${JSON.stringify(insertObject, undefined, 4)}`);
 
         await tagMapper.insert(insertObject);
         index += 1;
