@@ -22,10 +22,12 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
   const uri = `${grabNode()}${request.originalUrl}`;
   try {
     console.log({
+      uri,
       method: request.method as never,
       body: request,
       headers: request.headers
     });
+
     const stream = await undici.request(uri, {
       method: "POST",
       body: request,
