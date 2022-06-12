@@ -25,7 +25,7 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
     console.log({
       uri,
       method: request.method as never,
-      body: request,
+      // body: request,
       headers: request.headers
     });
 
