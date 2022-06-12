@@ -255,6 +255,8 @@ export async function dataRoute(
       }
     }
 
+    console.log(`contentType ${contentType}`);
+
     const size = Number.parseInt(offset.size);
     const endOffset = Number.parseInt(offset.offset);
     const startOffset = endOffset - size + 1;
@@ -263,6 +265,8 @@ export async function dataRoute(
       "Content-Type": contentType || "text/plain",
       "Content-Length": size,
     });
+
+    console.log(size, endOffset, startOffset);
 
     const b64Transform = new B64Transform(startOffset);
     const streamJsonParser = StreamJson.parser();
