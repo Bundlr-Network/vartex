@@ -1,12 +1,12 @@
-import got from "got";
+// import got from "got";
 import { lookup as mimeLookup } from "mime-types";
-import { head, last, prop } from "rambda";
+// import { head, last } from "rambda";
 import { Request, Response } from "express";
-import { PassThrough, Transform } from "node:stream";
-import StreamChain from "stream-chain";
-import StreamJson from "stream-json";
-import StreamJsonPick from "stream-json/filters/Pick";
-import StreamJsonValues from "stream-json/streamers/StreamValues";
+import { Readable } from "node:stream";
+// import StreamChain from "stream-chain";
+// import StreamJson from "stream-json";
+// import StreamJsonPick from "stream-json/filters/Pick";
+// import StreamJsonValues from "stream-json/streamers/StreamValues";
 import {
   manifestQueueMapper,
   permawebPathMapper,
@@ -18,106 +18,107 @@ import {
   getTransaction,
   getTxOffset,
 } from "../query/transaction";
-import { forEachNode } from "../query/node";
+import { getDataFromChunksAsStream } from "../query/node";
 import { utf8DecodeTag, utf8DecodeTupleTag } from "../utility/encoding";
 import axios from "axios";
+import { toLong } from "../database/utils";
 
-class B64Transform extends Transform {
-  protected iterLength: number;
+// class B64Transform extends Transform {
+//   protected iterLength: number;
+//
+//   constructor(startOffset: number) {
+//     super();
+//     this.iterLength = startOffset;
+//   }
+//
+//   _transform(chunk: string, encoding: string, callback: () => void) {
+//     // ensure string
+//     chunk = "" + chunk;
+//
+//     // Add previous extra and remove any newline characters
+//     chunk = chunk.replace(/(\r\n|\n|\r)/gm, "");
+//
+//     const buf = Buffer.from(chunk, "base64url");
+//     this.iterLength += buf.length;
+//     this.push(buf);
+//
+//     callback();
+//   }
+//
+//   _flush(callback: () => void) {
+//     callback();
+//   }
+// }
 
-  constructor(startOffset: number) {
-    super();
-    this.iterLength = startOffset;
-  }
-
-  _transform(chunk: string, encoding: string, callback: () => void) {
-    // ensure string
-    chunk = "" + chunk;
-
-    // Add previous extra and remove any newline characters
-    chunk = chunk.replace(/(\r\n|\n|\r)/gm, "");
-
-    const buf = Buffer.from(chunk, "base64url");
-    this.iterLength += buf.length;
-    this.push(buf);
-
-    callback();
-  }
-
-  _flush(callback: () => void) {
-    callback();
-  }
-}
-
-function recurNextChunk(
-  response: Response,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pipeline: any,
-  endOffset: number,
-  nextOffset: number,
-  retry = 0
-) {
-  const passThru = new PassThrough();
-  const nodeGrab: string = forEachNode(retry);
-
-  const chunkStream = got.stream(`${nodeGrab}/chunk/${nextOffset}`, {
-    followRedirect: true,
-  });
-
-  let hasError = false;
-  let pipeStarted = false;
-
-  chunkStream.on("error", () => {
-    hasError = true;
-    if (retry < 4) {
-      return recurNextChunk(
-        response,
-        pipeline,
-        endOffset,
-        nextOffset,
-        retry + 1
-      );
-    } else {
-      response.end();
-      passThru.unpipe(pipeline);
-      chunkStream.unpipe(passThru);
-      chunkStream.destroy();
-    }
-  });
-
-  chunkStream.on("downloadProgress", () => {
-    if (!pipeStarted && !hasError) {
-      pipeStarted = true;
-      chunkStream.pipe(passThru).pipe(pipeline);
-    }
-  });
-
-  chunkStream.on("end", () => {
-    if (nextOffset < endOffset) {
-      chunkStream.unpipe(passThru);
-      passThru.unpipe(pipeline);
-
-      // maybe a bug in the library itself, but it stays otherwise
-      // stuck in "done" state, here we restart the json parser
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      head<any>(pipeline.streams)._expect = "value";
-
-      return recurNextChunk(
-        response,
-        pipeline,
-        endOffset,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        last<any>(pipeline.streams).iterLength,
-        0
-      );
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      head<any>(pipeline.streams)._expect = "done";
-      pipeline.on("end", response.end.bind(response));
-      pipeline.end();
-    }
-  });
-}
+// function recurNextChunk(
+//   response: Response,
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   pipeline: any,
+//   endOffset: number,
+//   nextOffset: number,
+//   retry = 0
+// ) {
+//   const passThru = new PassThrough();
+//   const nodeGrab: string = forEachNode(retry);
+//
+//   const chunkStream = got.stream(`${nodeGrab}/chunk/${nextOffset}`, {
+//     followRedirect: true,
+//   });
+//
+//   let hasError = false;
+//   let pipeStarted = false;
+//
+//   chunkStream.on("error", () => {
+//     hasError = true;
+//     if (retry < 4) {
+//       return recurNextChunk(
+//         response,
+//         pipeline,
+//         endOffset,
+//         nextOffset,
+//         retry + 1
+//       );
+//     } else {
+//       response.end();
+//       passThru.unpipe(pipeline);
+//       chunkStream.unpipe(passThru);
+//       chunkStream.destroy();
+//     }
+//   });
+//
+//   chunkStream.on("downloadProgress", () => {
+//     if (!pipeStarted && !hasError) {
+//       pipeStarted = true;
+//       chunkStream.pipe(passThru).pipe(pipeline);
+//     }
+//   });
+//
+//   chunkStream.on("end", () => {
+//     if (nextOffset < endOffset) {
+//       chunkStream.unpipe(passThru);
+//       passThru.unpipe(pipeline);
+//
+//       // maybe a bug in the library itself, but it stays otherwise
+//       // stuck in "done" state, here we restart the json parser
+//       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//       head<any>(pipeline.streams)._expect = "value";
+//
+//       return recurNextChunk(
+//         response,
+//         pipeline,
+//         endOffset,
+//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//         last<any>(pipeline.streams).iterLength,
+//         0
+//       );
+//     } else {
+//       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//       head<any>(pipeline.streams)._expect = "done";
+//       pipeline.on("end", response.end.bind(response));
+//       pipeline.end();
+//     }
+//   });
+// }
 
 // C6IyOj4yAaJPaV8KuOG2jdf4gQCmpPisuE3eAUBdcUs
 export async function dataRoute(
@@ -279,28 +280,32 @@ export async function dataRoute(
 
     console.log(size, endOffset, startOffset);
 
-    const b64Transform = new B64Transform(startOffset);
-    const streamJsonParser = StreamJson.parser();
+    // const b64Transform = new B64Transform(startOffset);
+    // const streamJsonParser = StreamJson.parser();
+    //
+    // const pipeline = StreamChain.chain([
+    //   streamJsonParser,
+    //   StreamJsonPick.pick({ filter: "chunk" }),
+    //   StreamJsonValues.streamValues(),
+    //   prop("value"),
+    //   b64Transform,
+    // ]);
+    //
+    // pipeline.pipe(response);
+    // response.on("error", (error) => {
+    //   console.error(`Error occurred while piping response - ${error}`);
+    //   response.end();
+    // });
+    // pipeline.on("error", (error: any) => {
+    //   console.error(`Error occurred while piping chunk pipeline - ${error}`);
+    //   response.end();
+    // });
 
-    const pipeline = StreamChain.chain([
-      streamJsonParser,
-      StreamJsonPick.pick({ filter: "chunk" }),
-      StreamJsonValues.streamValues(),
-      prop("value"),
-      b64Transform,
-    ]);
+    const stream = Readable.from(getDataFromChunksAsStream({ startOffset: toLong(startOffset), endOffset: toLong(endOffset) }));
 
-    pipeline.pipe(response);
-    response.on("error", (error) => {
-      console.error(`Error occurred while piping response - ${error}`);
-      response.end();
-    });
-    pipeline.on("error", (error: any) => {
-      console.error(`Error occurred while piping chunk pipeline - ${error}`);
-      response.end();
-    });
+    // recurNextChunk(response, pipeline, endOffset, startOffset);
 
-    recurNextChunk(response, pipeline, endOffset, startOffset);
+    stream.pipe(response);
   } else {
     console.error(`offset for ${txId} wasn't found`);
     response.sendStatus(404);

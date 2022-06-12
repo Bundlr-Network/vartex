@@ -243,3 +243,28 @@ export async function getDataFromChunks({
 
   return error ? undefined : chunks;
 }
+
+
+export async function* getDataFromChunksAsStream({
+  startOffset,
+  endOffset,
+}: {
+  startOffset: CassandraTypes.Long;
+  endOffset: CassandraTypes.Long;
+}): AsyncGenerator<Uint8Array | undefined> {
+  let byte = 0;
+
+  while (startOffset.add(byte).lt(endOffset)) {
+
+    const chunk = await getChunk({
+      offset: startOffset.add(byte).toString(),
+    });
+
+    if (chunk) {
+      byte += chunk.chunkSize;
+      yield chunk.chunk;
+    } else {
+      throw new Error("Not enough bytes");
+    }
+  }
+}
