@@ -306,6 +306,22 @@ export async function consumeQueueOnce(): Promise<void> {
         console.log("Importing pending tx");
         const minusOne = toLong(-1);
         const tx = job.data as Transaction;
+        await insertGqlTag({
+          data_root: tx.data_root,
+          data_size: tx.data_size,
+          data_tree: tx.data_tree || [],
+          format: tx.format,
+          id: tx.id,
+          last_tx: tx.last_tx,
+          owner: tx.owner,
+          quantity: tx.quantity,
+          reward: tx.reward,
+          signature: tx.signature,
+          tags: tx.tags,
+          target: tx.target,
+          tx_id: tx.id,
+          tx_index: minusOne
+        });
         await insertTx({
           tx_index: minusOne,
           data_item_index: minusOne,
