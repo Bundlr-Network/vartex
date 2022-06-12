@@ -24,11 +24,12 @@ export async function txUploadRoute(
 
     console.log(`${host}/tx`);
 
+    console.log(request.headers)
     const result = await got.post(`${host}/tx`, {
       followRedirect: true,
       json: request.body,
       headers: {
-        "X-Network": request.headers["X-Network"]
+        "X-Network": request.headers["x-network"]
       }
     });
 
