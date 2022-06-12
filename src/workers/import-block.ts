@@ -47,7 +47,7 @@ export async function importBlock(
 
   if (Array.isArray(newBlock.txs)) {
     for (const txId of newBlock.txs) {
-      await importTxQueue.add("Import tx", {
+      await importTxQueue.add("Import Tx", {
         tx_id: txId,
         block_hash: newBlock.indep_hash,
         block_height: height,
