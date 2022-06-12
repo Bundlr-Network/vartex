@@ -198,16 +198,20 @@ async function findMissingBlocks(hashList: string[]): Promise<UnsyncedBlock[]> {
   for await (const rowResult of result) {
     const matchingRow = hashListObject[rowResult.height.toString()];
 
+    console.log(matchingRow)
+    console.log(matchingRow["hash"])
+    console.log(rowResult.indep_hash)
+    console.log(rowResult.height);
     if (
       matchingRow &&
       R.equals(matchingRow["hash"], rowResult.indep_hash) &&
-      R.equals(matchingRow["height"], rowResult.height)
+      R.equals(+matchingRow["height"], rowResult.height)
     ) {
       delete hashListObject[rowResult.height];
     } else {
       if (!matchingRow) {
         log.info(`Found missing block: ${rowResult.height}`);
-      } else if (!R.equals(matchingRow["height"], rowResult.height)) {
+      } else if (!R.equals(+matchingRow["height"], rowResult.height)) {
         log.info(
           `Found mismatching block at: ${rowResult.height} because ${matchingRow["height"]} != ${rowResult.height}`
         );
