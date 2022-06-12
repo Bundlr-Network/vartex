@@ -405,7 +405,7 @@ export const findTxIDsFromTxFilters = async (
     const secondaryTagPairs = remove(primaryTagPair, 1, tagPairs);
     const tagEqualsQuery = `AND tag_pair = ${tagPairs[0]}`;
     const idsFilter = queryParameters.ids?.length > 0 ? `AND tx_id IN ('${queryParameters.ids.join("','")}')` : "";
-    const targetFilter = queryParameters.ids?.length > 0 ? `AND tx_id IN ('${queryParameters.ids.join("','")}')` : "";
+    const targetFilter = queryParameters.ids?.length > 0 ? `AND target IN ('${queryParameters.recipients.join("','")}')` : "";
     const tagsContainsQuery =
       secondaryTagPairs.length === 0
         ? ""
