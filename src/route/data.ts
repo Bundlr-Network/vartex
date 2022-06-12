@@ -280,10 +280,12 @@ export async function dataRoute(
     ]);
 
     pipeline.pipe(response);
-    response.on("error", () => {
+    response.on("error", (error) => {
+      console.error(`Error occurred while piping response - ${error}`);
       response.end();
     });
-    pipeline.on("error", () => {
+    pipeline.on("error", (error: any) => {
+      console.error(`Error occurred while piping chunk pipeline - ${error}`);
       response.end();
     });
 
