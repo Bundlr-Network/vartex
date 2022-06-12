@@ -58,13 +58,12 @@ export const insertGqlTag = async (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const environment: any = R.pickAll(allFields, tx);
 
-      console.log(tagMapper);
+      console.log(`Mapper - ${tagMapper.name}`);
       console.log(`allFields ${JSON.stringify(allFields, undefined, 4)}`);
 
       // until ans104 comes
-      if (!environment["data_item_index"]) {
-        environment["data_item_index"] = toLong(-1);
-      }
+      environment.data_item_index ??= toLong(-1);
+
       if (
         typeof environment.owner === "string" &&
         environment.owner.length > 43
@@ -74,7 +73,7 @@ export const insertGqlTag = async (
 
       environment.bundled_in ??= "";
 
-      console.log(`environment ${environment}`)
+      // console.log(`environment ${environment}`)
 
       let index = 0;
       for (const { name, value } of tx.tags) {
@@ -85,7 +84,7 @@ export const insertGqlTag = async (
           tag_index: index
         });
 
-        console.log(`insertObject ${JSON.stringify(insertObject, undefined, 4)}`);
+        // console.log(`insertObject ${JSON.stringify(insertObject, undefined, 4)}`);
 
         await tagMapper.insert(insertObject);
         index += 1;
