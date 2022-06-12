@@ -206,7 +206,7 @@ export const findTxIDsFromTxFilters = async (
         : "txs_sorted_desc"
       : filtersToTable[sortOrder][tableKey];
 
-  if (isBucketSearchTag && txFilterKeys.length > 0) t += "_by";
+  // if (isBucketSearchTag && txFilterKeys.length > 0) t += "_by";
 
   // console.log(txFilterKeys);
   // console.log(t);
