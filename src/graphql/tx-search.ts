@@ -198,8 +198,8 @@ export const findTxIDsFromTxFilters = async (
 
   const t = isBucketSearchTag
     ? sortOrder === "HEIGHT_ASC"
-      ? "tx_tag_gql_by_"
-      : "tx_tag_gql_by_"
+      ? "tx_tag_gql_by"
+      : "tx_tag_gql_by"
     : isBucketSearchTx
       ? sortOrder === "HEIGHT_ASC"
         ? "txs_sorted_asc"
