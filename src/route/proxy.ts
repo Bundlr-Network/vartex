@@ -27,7 +27,7 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
       headers: request.headers
     });
     const stream = await undici.request(uri, {
-      method: request.method as never,
+      method: "POST",
       body: request,
       headers: request.headers
     });
