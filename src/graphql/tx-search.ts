@@ -355,6 +355,9 @@ export const findTxIDsFromTxFilters = async (
         ? tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ")
         : "";
 
+      console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+      } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
+
       const nextResult = await cassandraClient.execute(
         `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
         } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
