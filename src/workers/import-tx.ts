@@ -82,7 +82,7 @@ export const insertGqlTag = async (
           tag_index: index
         });
 
-        // console.log(`insertObject ${JSON.stringify(insertObject, undefined, 4)}`);
+        console.log(`insertObject ${JSON.stringify(insertObject, undefined, 4)}`);
 
         await tagMapper.insert(insertObject);
         index += 1;
