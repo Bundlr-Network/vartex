@@ -19,19 +19,19 @@ export function proxyGetRoute(request: Request, response: Response): void {
 
 export function proxyPostRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
-  console.log(request.body);
+  console.log(`Body ${request.body}`);
   const stream = got.stream.post(uri, {
     body: JSON.stringify(request.body),
   });
   stream.on("error", (error) => {
     console.log(error);
 
-    response.status(503).send();
+    response.status(503).send().end();
     console.log(`[POST] Failed to post: ${uri}`);
   });
   stream.on("end", () => response.end());
   stream.on("error", (e) => {
-    console.error(`Error ocurred while piping chunks to ${uri} - ${e}`);
+    console.error(`Error occurred while piping chunks to ${uri} - ${e}`);
     response.status(500).end();
   })
   stream.pipe(response);
