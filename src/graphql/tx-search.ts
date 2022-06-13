@@ -454,10 +454,10 @@ export const findTxIDsFromTxFilters = async (
 
     const txFilterQ = await Promise.all([
         await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`).then(r => r.rows),
         await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`).then(r => r.rows)
         ]);
 
