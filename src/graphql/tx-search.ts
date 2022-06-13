@@ -9,6 +9,7 @@ import { QueryTransactionsArgs as QueryTransactionsArguments } from "./types.gra
 import { toB64url } from "../query/transaction";
 import { KEYSPACE } from "../constants";
 import Row = types.Row;
+import { ownerToAddress } from "../utility/encoding";
 
 
 const megaTagPairsList = Object.values(megaTagPairs);
@@ -504,6 +505,7 @@ export const findTxIDsFromTxFilters = async (
 
 function filterIdResults(results: Row[], filterKeys: string[], queryParameters: QueryTransactionsArguments): Row[] {
   return results.filter(row => {
+    row["owner"] = ownerToAddress(row["owner"]);
     for (const key of filterKeys) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
