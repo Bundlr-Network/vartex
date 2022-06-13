@@ -326,7 +326,7 @@ export const findTxIDsFromTxFilters = async (
   let hasNextPage = false;
   let txsFilterRows = [];
 
-  const pendingFilter = (queryParameters.block.min || queryParameters.block.max)
+  const pendingFilter = (queryParameters.block?.min || queryParameters.block?.max)
     ? "AND tx_index = -1"
       : "";
 
