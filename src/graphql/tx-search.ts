@@ -509,7 +509,7 @@ function filterIdResults(results: Row[], filterKeys: string[], queryParameters: 
     for (const key of filterKeys) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const qp = queryParameters[key];
+      const qp = queryParameters[key] || queryParameters["recipients"];
       console.log(row)
       console.log(filterToColumn)
       console.log(key)
