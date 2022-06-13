@@ -49,28 +49,28 @@ export const insertTx = async (
   const data_item_index = tx.data_item_index ?? toLong(-1);
   try {
     await transactionMapper.update(tx, {
-      fields: ["block_height", "block_hash", "bundled_in"]
+      fields: ["tx_id", "block_height", "block_hash", "bundled_in"]
     });
     console.log(`Inserted into transactionMapper - ${tx.tx_id}`);
     const nthMillion = tx.block_height.mul(1e6);
     await txsSortedAscMapper.update(
         { nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index },
         {
-          fields: ["tx_index", "data_item_index"]
+          fields: ["nth_million", "tx_index", "data_item_index"]
         }
     );
     console.log(`Inserted into txsSortedAscMapper - ${tx.tx_id}`);
     await txsSortedDescMapper.update(
         { nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index },
         {
-          fields: ["tx_index", "data_item_index"]
+          fields: ["nth_million", "tx_index", "data_item_index"]
         }
     );
     console.log(`Inserted into txsSortedDescMapper - ${tx.tx_id}`);
     if (data_item_index.eq(toLong(-1))) {
       await txOffsetMapper.update({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size },
           {
-            fields: ["offset"]
+            fields: ["tx_id", "offset"]
           }
           );
       console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
@@ -114,7 +114,7 @@ export const insertTx = async (
       await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
       }), {
-        fields: ["tx_index", "data_item_index"]
+        fields: [ ...fields, "tx_index", "data_item_index"]
       }, {
         logged: true
       })
