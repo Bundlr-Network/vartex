@@ -383,13 +383,21 @@ export const findTxIDsFromTxFilters = async (
       console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
       } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
 
-      const nextResult = await cassandraClient.execute(
-        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
-        } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
-        { prepare: true }
-      );
 
-      for (const row of nextResult.rows) {
+      const nextResult = await Promise.all([
+          await cassandraClient.execute(
+        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+              } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
+              { prepare: true }
+            ),
+          pendingFilter ? await cassandraClient.execute(
+        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+              } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
+              { prepare: true }
+            ) : Promise.resolve([]),
+      ]).then(r => r.flat());
+
+      for (const row of nextResult) {
         !hasNextPage &&
           txsFilterRows.push(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -432,13 +440,15 @@ export const findTxIDsFromTxFilters = async (
     console.log("txFilterQ - else");
     console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} ${pendingFilter} LIMIT ${limit + 1
     } `)
-    const txFilterQ = await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} ${pendingFilter} LIMIT ${limit + 1
-      } `
-    );
+    const txFilterQ = await Promise.all([
+        await cassandraClient.execute(
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${limit + 1}`),
+        await cassandraClient.execute(
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereClause} LIMIT ${limit + 1}`)
+    ]);
 
-    txsFilterRows = txFilterQ.rows;
-    hasNextPage = txFilterQ.rows.length > limit;
+    txsFilterRows = txFilterQ;
+    hasNextPage = txFilterQ.length > limit;
   }
 
   const cursors = txsFilterRows.slice(1, limit + 1).map((row) =>
