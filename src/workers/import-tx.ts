@@ -90,46 +90,41 @@ export const insertGqlTag = async (
 };
 
 export const importTx = async (txId: string, blockHash: string): Promise<TxReturnCode> => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  const block = await blockMapper.get({ indep_hash: blockHash });
 
-  if (blockHash !== "PENDING") {
-    const block = await blockMapper.get({ indep_hash: blockHash });
+  if (!block) {
+    log(
+      `blockHash ${blockHash} has not been imported (or was removed?), therefore not importing ${txId}`
+    );
+    return TxReturnCode.REQUEUE;
+  }
 
-    if (!block) {
+  console.log(`Got block ${block.height}`);
+
+  if (!block.txs.includes(txId)) {
+    log(
+      `Abandoned tx detected? It was not found in txs of block ${blockHash}, therefore dequeue-ing ${txId}`
+    );
+
+    return TxReturnCode.DEQUEUE;
+  }
+
+  // check if it's already imported, or is attached to abandoned fork
+  const maybeImportedTx = await transactionMapper.get({ tx_id: txId });
+
+
+  if (maybeImportedTx && maybeImportedTx?.block_hash !== "PENDING") {
+    if (maybeImportedTx.block_hash === blockHash) {
       log(
-          `blockHash ${blockHash} has not been imported (or was removed?), therefore not importing ${txId}`
+        `Already imported transaction ${txId}! If you want to force a re-import, please remove the old one first.`
       );
-      return TxReturnCode.REQUEUE;
-    }
-
-    console.log(`Got block ${block.height}`);
-
-    if (!block.txs.includes(txId)) {
-      log(
-          `Abandoned tx detected? It was not found in txs of block ${blockHash}, therefore dequeue-ing ${txId}`
-      );
-
       return TxReturnCode.DEQUEUE;
-    }
-
-    // check if it's already imported, or is attached to abandoned fork
-    const maybeImportedTx = await transactionMapper.get({ tx_id: txId });
-
-
-    if (maybeImportedTx) {
-      if (maybeImportedTx.block_hash === blockHash) {
-        log(
-            `Already imported transaction ${txId}! If you want to force a re-import, please remove the old one first.`
-        );
-        return TxReturnCode.DEQUEUE;
-      } else {
-        log(
-            `Misplaced transaction ${txId}! Perhaps block with hash ${maybeImportedTx.block_hash} was abandoned?\n` +
-            `Moving on to import the tx to block ${blockHash} at height ${block.height}`
-        );
-        return TxReturnCode.DEQUEUE;
-      }
+    } else {
+      log(
+        `Misplaced transaction ${txId}! Perhaps block with hash ${maybeImportedTx.block_hash} was abandoned?\n` +
+        `Moving on to import the tx to block ${blockHash} at height ${block.height}`
+      );
+      return TxReturnCode.DEQUEUE;
     }
   }
 
