@@ -328,9 +328,12 @@ export const findTxIDsFromTxFilters = async (
 
   console.log(queryParameters.block);
 
+  console.log(Boolean(queryParameters.block?.min || queryParameters.block?.max));
   const pendingFilter = (queryParameters.block?.min || queryParameters.block?.max)
     ? "AND tx_index = -1"
       : "";
+
+  console.log(pendingFilter);
 
   if (isBucketSearchTx) {
     const xBuckets = toLong(txsMaxHeight).div(1e6).add(1);
