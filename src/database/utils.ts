@@ -51,12 +51,12 @@ export const insertTx = async (
     await transactionMapper.update(tx);
     console.log(`Inserted into transactionMapper - ${tx.tx_id}`);
     const nthMillion = tx.block_height.mul(1e6);
-    await txsSortedAscMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+    await txsSortedAscMapper.update({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
     console.log(`Inserted into txsSortedAscMapper - ${tx.tx_id}`);
-    await txsSortedDescMapper.insert({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
+    await txsSortedDescMapper.update({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
     console.log(`Inserted into txsSortedDescMapper - ${tx.tx_id}`);
     if (data_item_index.eq(toLong(-1))) {
-      await txOffsetMapper.insert({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
+      await txOffsetMapper.update({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size });
       console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
     }
 
@@ -95,7 +95,7 @@ export const insertTx = async (
       // }), undefined, {
       //   logged: true
       // });
-      await txxMapper.insert(R.merge(environment, {
+      await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
       }), undefined, {
         logged: true
