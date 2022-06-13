@@ -288,6 +288,8 @@ export async function consumeQueueOnce(): Promise<void> {
   const importTxScheduler = new MQ.QueueScheduler(importTxQueue.name);
 
   const worker = new MQ.Worker<ImportTxJob | Omit<Transaction, 'data'>>(importTxQueue.name, async function (job) {
+    console.log()
+    console.log()
     switch (job.name) {
       case "Import Tx": {
         console.log(`Running Import Tx job - ${job.data.tx_id}`);
