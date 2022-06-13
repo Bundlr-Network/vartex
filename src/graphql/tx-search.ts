@@ -509,6 +509,8 @@ function filterIdResults(results: Row[], filterKeys: string[], queryParameters: 
       // @ts-ignore
       const qp = queryParameters[key];
       console.log(row)
+      console.log(filterToColumn)
+      console.log(key)
       console.log(qp);
       console.log(row[key] || row[filterToColumn[key]]);
       if (Array.isArray(qp)) {
