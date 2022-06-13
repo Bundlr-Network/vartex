@@ -453,6 +453,7 @@ export const findTxIDsFromTxFilters = async (
     hasNextPage = txFilterQ.length > limit;
   }
 
+  console.log(txsFilterRows);
   const cursors = txsFilterRows.slice(1, limit + 1).map((row) =>
     encodeCursor({
       sortOrder,
