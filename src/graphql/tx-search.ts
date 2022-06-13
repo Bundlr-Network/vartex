@@ -3,11 +3,12 @@ import { remove } from "ramda";
 import megaTagPairs from "../../static/mega-tagpairs.json" assert {type: "json"}
 import { cassandraClient } from "../database/cassandra";
 import { toLong } from "../database/utils";
-import { types as CassandraTypes } from "cassandra-driver";
+import { types, types as CassandraTypes } from "cassandra-driver";
 import { TxSearchResult } from "./resolver-types";
 import { QueryTransactionsArgs as QueryTransactionsArguments } from "./types.graphql";
 import { toB64url } from "../query/transaction";
 import { KEYSPACE } from "../constants";
+import Row = types.Row;
 
 
 const megaTagPairsList = Object.values(megaTagPairs);
@@ -179,6 +180,29 @@ export const findTxIDsFromTxFilters = async (
   const txFilterKeys = buildTxFilterKey(queryParameters);
   const tableKey = txFilterKeys.sort().join("_");
 
+  const limit = Math.min(100, queryParameters.first || 10);
+
+  if (queryParameters.ids?.length > 0 && !queryParameters.tags?.length) {
+    const results = await cassandraClient.execute(`SELECT tx_id FROM transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') ${limit + 1}`)
+        .then(r => filterIdResults(r.rows, txFilterKeys, queryParameters));
+
+    const cursors = results.slice(1, limit + 1).map((row) =>
+        encodeCursor({
+          sortOrder,
+          txIndex: row.tx_index.toString(),
+          dataItemIndex: row.data_item_index.toString(),
+          nthBucket: R.isEmpty(txFilterKeys_) ? (row.block_height.div(1e6)) : -1,
+        })
+    );
+
+    const txSearchResult = results.slice(0, limit).map((row, index) => ({
+      txId: row.tx_id,
+      cursor: index < cursors.length ? cursors[index] : undefined,
+    }));
+
+    return [txSearchResult, results.length > limit];
+  }
+
   console.log("txFilterKeys", txFilterKeys)
 
   const sortOrder =
@@ -261,8 +285,6 @@ export const findTxIDsFromTxFilters = async (
     return [[], false];
   }
 
-  const limit = Math.min(100, queryParameters.first || 10);
-
   let tagPairs: string[] = [];
 
   if (queryParameters.tags && !R.isEmpty(queryParameters.tags)) {
@@ -324,7 +346,7 @@ export const findTxIDsFromTxFilters = async (
 
 
   let hasNextPage = false;
-  let txsFilterRows = [];
+  let txsFilterRows: Row[] = [];
 
   console.log(queryParameters.block);
 
@@ -384,24 +406,23 @@ export const findTxIDsFromTxFilters = async (
       } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
 
 
-      const nextResult = await Promise.all([
+      const nextResult: Row[] = await Promise.all([
           await cassandraClient.execute(
         `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
               } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
               { prepare: true }
-            ),
+            ).then(r => r.rows),
           pendingFilter ? await cassandraClient.execute(
         `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
               } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
               { prepare: true }
-            ) : Promise.resolve([]),
+            ).then(r => r.rows) : Promise.resolve([]),
       ]).then(r => r.flat());
 
       for (const row of nextResult) {
         !hasNextPage &&
           txsFilterRows.push(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (R.assoc as any)("nthBucket", buckets[nthBucket], row)
+              R.assoc("nthBucket", buckets[nthBucket], row) as unknown as Row
           );
         if (resultCount !== limit) {
           resultCount += 1;
@@ -472,3 +493,19 @@ export const findTxIDsFromTxFilters = async (
 
   return [txSearchResult, hasNextPage];
 };
+
+
+function filterIdResults(results: Row[], filterKeys: string[], queryParameters: QueryTransactionsArguments): Row[] {
+  return results.filter(row => {
+    for (const key of filterKeys) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      console.log(queryParameters[key]);
+      console.log(row[key]);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (queryParameters[key] !== row[key]) return false;
+    }
+    return true;
+  })
+}
