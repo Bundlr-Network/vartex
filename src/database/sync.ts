@@ -125,7 +125,7 @@ const pollNewBlocks = async (): Promise<void> => {
       async () => {
         try {
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-          await (pMinDelay as any)(await pollNewBlocks(), 120 * 1000);
+          await (pMinDelay as any)(await pollNewBlocks(), 10 * 1000);
         } catch (error) {
           console.error(error);
         }
