@@ -505,7 +505,7 @@ export const findTxIDsFromTxFilters = async (
 
 function filterIdResults(results: Row[], filterKeys: string[], queryParameters: QueryTransactionsArguments): Row[] {
   return results.filter(row => {
-    row["owner"] = ownerToAddress(row["owner"]);
+    row["owner"] = row["owner"] ? ownerToAddress(row["owner"]) : undefined;
     for (const key of filterKeys) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
