@@ -184,7 +184,7 @@ export const findTxIDsFromTxFilters = async (
   const limit = Math.min(100, queryParameters.first || 10);
 
   if (queryParameters.ids?.length > 0 && !queryParameters.tags?.length) {
-    console.log(`SELECT tx_id FROM ${KEYSPACE}.transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') LIMIT ${limit + 1}`);
+    console.log(`SELECT * FROM ${KEYSPACE}.transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') LIMIT ${limit + 1}`);
     console.log(txFilterKeys);
     const results = await cassandraClient.execute(`SELECT tx_id FROM ${KEYSPACE}.transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') LIMIT ${limit + 1}`)
         .then(r => filterIdResults(r.rows, txFilterKeys, queryParameters));
