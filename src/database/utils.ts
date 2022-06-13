@@ -49,7 +49,26 @@ export const insertTx = async (
   const data_item_index = tx.data_item_index ?? toLong(-1);
   try {
     await transactionMapper.update(tx, {
-      fields: ["tx_id", "block_height", "block_hash", "bundled_in"]
+      fields: [
+          "tx_index",
+        "data_item_index",
+        "block_height",
+        "block_hash",
+        "bundled_in",
+        "data_root",
+        "data_size",
+        "data_tree",
+        "format",
+        "tx_id",
+        "last_tx",
+        "owner",
+        "quantity",
+        "reward",
+        "signature",
+        "tags",
+        "tag_count",
+        "target",
+      ]
     });
     console.log(`Inserted into transactionMapper - ${tx.tx_id}`);
     const nthMillion = tx.block_height.mul(1e6);
@@ -111,12 +130,6 @@ export const insertTx = async (
       // }), undefined, {
       //   logged: true
       // });
-
-      console.log(R.merge(environment, {
-        tag_pairs: tags
-      }));
-
-      console.log(fields);
 
       await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
