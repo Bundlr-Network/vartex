@@ -116,10 +116,12 @@ export const insertTx = async (
         tag_pairs: tags
       }));
 
+      console.log(fields);
+
       await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
       }), {
-        fields: [ ...fields, "tx_index", "data_item_index"]
+        fields: [ ...fields, "tx_index", "data_item_index", "tag_pairs"]
       }, {
         logged: true
       })
