@@ -211,10 +211,11 @@ export const resolvers = {
           }
 
           console.log("Got")
+          console.log(block)
 
           return {
             cursor,
-            node: R.assoc("block", block, tx),
+            node: block ? R.assoc("block", block, tx) : tx,
           };
         })
       )) as TransactionEdge[];
