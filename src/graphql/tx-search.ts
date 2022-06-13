@@ -326,6 +326,10 @@ export const findTxIDsFromTxFilters = async (
   let hasNextPage = false;
   let txsFilterRows = [];
 
+  const pendingFilter = (queryParameters.block.min || queryParameters.block.max)
+    ? "AND tx_index = -1"
+      : "";
+
   if (isBucketSearchTx) {
     const xBuckets = toLong(txsMaxHeight).div(1e6).add(1);
 
@@ -371,11 +375,11 @@ export const findTxIDsFromTxFilters = async (
         ? tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ")
         : "";
 
-      console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+      console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
       } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
 
       const nextResult = await cassandraClient.execute(
-        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+        `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
         } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
         { prepare: true }
       );
@@ -409,11 +413,11 @@ export const findTxIDsFromTxFilters = async (
 
     console.log("txFilterQ - else if isBucketSearchTag");
 
-    console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
+    console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
     } ALLOW FILTERING`)
 
     const txFilterQ = await cassandraClient.execute(
-      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`
     );
 
