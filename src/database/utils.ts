@@ -111,6 +111,11 @@ export const insertTx = async (
       // }), undefined, {
       //   logged: true
       // });
+
+      console.log(R.merge(environment, {
+        tag_pairs: tags
+      }));
+
       await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
       }), {
