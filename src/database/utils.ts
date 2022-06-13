@@ -56,21 +56,21 @@ export const insertTx = async (
     await txsSortedAscMapper.update(
         { nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index },
         {
-          fields: ["nth_million", "tx_index", "data_item_index"]
+          fields: ["nth_million", "tx_id", "tx_index", "data_item_index"]
         }
     );
     console.log(`Inserted into txsSortedAscMapper - ${tx.tx_id}`);
     await txsSortedDescMapper.update(
         { nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index },
         {
-          fields: ["nth_million", "tx_index", "data_item_index"]
+          fields: ["nth_million", "tx_id", "tx_index", "data_item_index"]
         }
     );
     console.log(`Inserted into txsSortedDescMapper - ${tx.tx_id}`);
     if (data_item_index.eq(toLong(-1))) {
       await txOffsetMapper.update({ tx_id: tx.tx_id, offset: tx.offset, size: tx.data_size },
           {
-            fields: ["tx_id", "offset"]
+            fields: ["tx_id", "offset", "size"]
           }
           );
       console.log(`Inserted into txOffsetMapper - ${tx.tx_id}`);
