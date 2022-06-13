@@ -331,7 +331,7 @@ export const findTxIDsFromTxFilters = async (
   console.log(Boolean(queryParameters.block?.min || queryParameters.block?.max));
   const pendingFilter = (queryParameters.block?.min || queryParameters.block?.max)
     ? ""
-      : "AND tx_index = -1";
+      : "tx_index = -1";
 
   console.log(pendingFilter);
 
