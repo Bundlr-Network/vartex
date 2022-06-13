@@ -215,7 +215,7 @@ export const resolvers = {
 
           return {
             cursor,
-            node: block ? R.assoc("block", block, tx) : tx,
+            node: block === {} ? R.assoc("block", block, tx) : tx,
           };
         })
       )) as TransactionEdge[];
