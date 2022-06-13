@@ -508,8 +508,9 @@ function filterIdResults(results: Row[], filterKeys: string[], queryParameters: 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const qp = queryParameters[key];
+      console.log(row)
       console.log(qp);
-      console.log(row[filterToColumn[key]]);
+      console.log(row[key] || row[filterToColumn[key]]);
       if (Array.isArray(qp)) {
         if (!qp.includes(row[key] || row[filterToColumn[key]])) return false;
       } else {
