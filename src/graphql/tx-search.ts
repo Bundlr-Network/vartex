@@ -236,7 +236,7 @@ export const findTxIDsFromTxFilters = async (
   const txsMinHeight_ =
     typeof queryParameters.block === "object" &&
       typeof queryParameters.block.min === "number"
-      ? queryParameters.block.min * 1000
+      ? Math.max(queryParameters.block.min * 1000, -1)
       : 0;
 
   const txsMinHeight =
