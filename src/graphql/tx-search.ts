@@ -154,7 +154,8 @@ function encodeCursor({
 
 const filterToColumn: Record<string, string> = {
   "ids": "tx_id",
-  "owners": "owner"
+  "owners": "owner",
+  "recipient": "target"
 };
 
 function parseTxFilterCursor(cursor: string): TxFilterCursor {
