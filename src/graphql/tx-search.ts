@@ -249,8 +249,8 @@ export const findTxIDsFromTxFilters = async (
   const txsMaxHeight_ =
     typeof queryParameters.block === "object" &&
       typeof queryParameters.block.max === "number"
-      ? queryParameters.block.max * 1000
-      : maxHeightBlock.add(1).mul(1000).toString();
+      ? Math.max(queryParameters.block.max * 1000, -1)
+      : Math.max(maxHeightBlock.add(1).mul(1000).toInt(), -1);
 
   const txsMaxHeight =
     typeof maybeCursor.txIndex !== "undefined" && sortOrder === "HEIGHT_DESC"
@@ -440,6 +440,8 @@ export const findTxIDsFromTxFilters = async (
       nthBucket: R.isEmpty(txFilterKeys_) ? row.nthBucket : -1,
     })
   );
+
+
 
   const txSearchResult = txsFilterRows.slice(0, limit).map((row, index) => ({
     txId: row.tx_id,
