@@ -48,7 +48,9 @@ export const insertTx = async (
 ): Promise<void> => {
   const data_item_index = tx.data_item_index ?? toLong(-1);
   try {
-    await transactionMapper.update(tx);
+    await transactionMapper.update(tx, {
+      fields: ["block_height", "block_hash", "bundled_in"]
+    });
     console.log(`Inserted into transactionMapper - ${tx.tx_id}`);
     const nthMillion = tx.block_height.mul(1e6);
     await txsSortedAscMapper.update({ nth_million: nthMillion, tx_id: tx.tx_id, tx_index: tx.tx_index, data_item_index });
