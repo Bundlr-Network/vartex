@@ -502,11 +502,14 @@ function filterIdResults(results: Row[], filterKeys: string[], queryParameters: 
     for (const key of filterKeys) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      console.log(queryParameters[key]);
-      console.log(row[key] || row[filterToColumn[key]]);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (queryParameters[key] !== row[key]) return false;
+      const qp = queryParameters[key];
+      console.log(qp);
+      console.log(row[filterToColumn[key]]);
+      if (Array.isArray(qp)) {
+        if (!qp.includes(row[key] || row[filterToColumn[key]])) return false;
+      } else {
+        if (qp !== row[key]) return false;
+      }
     }
     return true;
   })
