@@ -438,8 +438,11 @@ export const findTxIDsFromTxFilters = async (
     hasNextPage = txFilterQ.rows.length > limit;
   } else {
     console.log("txFilterQ - else");
-    console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} ${pendingFilter} LIMIT ${limit + 1
-    } `)
+
+    const query1 = `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${limit + 1}`;
+    const query2 = `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereClause} LIMIT ${limit + 1}`;
+    console.log(query1);
+    console.log(query2);
     const txFilterQ = await Promise.all([
         await cassandraClient.execute(
       `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${limit + 1}`),
