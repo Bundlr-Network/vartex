@@ -452,13 +452,17 @@ export const findTxIDsFromTxFilters = async (
     console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
     } ALLOW FILTERING`)
 
-    const txFilterQ = await cassandraClient.execute(
+    const txFilterQ = await Promise.all([
+        await cassandraClient.execute(
       `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
-      } ALLOW FILTERING`
-    );
+      } ALLOW FILTERING`).then(r => r.rows),
+        await cassandraClient.execute(
+      `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} ${pendingFilter} LIMIT ${limit + 1
+      } ALLOW FILTERING`).then(r => r.rows)
+        ]);
 
-    txsFilterRows = txFilterQ.rows;
-    hasNextPage = txFilterQ.rows.length > limit;
+    txsFilterRows = txFilterQ.flat();
+    hasNextPage = txFilterQ.length > limit;
   } else {
     console.log("txFilterQ - else");
 
