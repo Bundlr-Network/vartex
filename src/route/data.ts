@@ -192,6 +192,7 @@ export async function dataRoute(
       console.error(`tx ${txId} wasn't found`);
 
       try {
+        console.log(`${process.env.BUNDLR_NODE}/tx/${txId}/data`);
         const res = await axios.get(`${process.env.BUNDLR_NODE}/tx/${txId}/data`, { responseType: "stream" });
 
         for (const [k, v] of Object.entries(res.headers))  response.header(k, v);
