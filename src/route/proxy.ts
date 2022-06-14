@@ -1,22 +1,21 @@
 import { Request, Response } from "express";
 import { grabNode } from "../query/node";
-import got from "got";
 // import * as undici from "undici";
 import axios from "axios";
 
-export function proxyGetRoute(request: Request, response: Response): void {
+export async function proxyGetRoute(request: Request, response: Response): void {
   const uri = `${grabNode()}${request.originalUrl}`;
-  const stream = got.stream.get(uri);
-  stream.on("error", (error) => {
-    response.status(404).json({
-      status: 404,
-      error: "Not Found: " + error,
-    });
+  const stream = await axios.get(uri, { headers: request.headers as Record<string, string>, responseType: "stream" });
+  stream.data.on("error", (e: any) => {
+    console.error(`Error occurred while proxying get req ${uri} - ${e}`);
+    response.sendStatus(404);
+    response.end();
+
 
     console.log(`[GET] Failed to get: ${uri}`);
   });
-  stream.on("end", () => response.end());
-  stream.pipe(response);
+  stream.data.on("end", () => response.end());
+  stream.data.pipe(response);
 }
 
 export async function proxyPostRoute(request: Request, response: Response): Promise<void> {
