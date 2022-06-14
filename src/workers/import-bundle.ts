@@ -56,13 +56,14 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
             tags = tx.tags.map(({ name, value }: UpstreamTag) => CassandraTypes.Tuple.fromArray([name, value]));
         }
 
-        const txx = await transactionMapper.get({ tx_id: innerTx });
+        const txx = await transactionMapper.get({ tx_id: innerTx.id });
 
         const indexOfBundleTx = block.txs.indexOf(bundleTxId);
         if (indexOfBundleTx === -1) throw new Error("Can't find tx in block");
 
         const tx_index = toLong(tx.height).mul(1000).add(indexOfBundleTx);
         try {
+            console.log("Inserting gql")
             await insertGqlTag({
                 data_root: null,
                 data_size: innerTx.dataSize,
