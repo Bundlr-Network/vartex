@@ -142,7 +142,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
       console.log(`Found ANS-104 tx ${tx.id}`);
       await importBundleQueue.add("Import Bundle", {
         txId: tx.id,
-        blockHeight: tx.height,
+        blockHeight: block.height,
         type: "ANS104"
       });
     }
@@ -231,8 +231,6 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 function isAns104(tx: Omit<Transaction, 'data'>): boolean {
   let format = false;
   let version = false;
-  console.log(tx.tags);
-  console.log(tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.decode(t.name), value: base64url.decode(t.value) })));
   for (const tag of tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.decode(t.name), value: base64url.decode(t.value) }))) {
     if (!format && tag.name.toLowerCase() === "bundle-format" && tag.value === "binary") {
       format = true;
