@@ -17,11 +17,13 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
     const block = await getBlock({ height: blockHeight });
     const { offset, size } = await getTxOffset({ txId: bundleTxId, retry: 3 }).then(r => ({ offset: toLong(r.offset), size: toLong(r.size) }));
     const tx = await getTransaction({ txId: bundleTxId, retry: 3 });
+    console.log(`Got tx ${tx}`)
     const txs = await processStream(getDataFromChunksAsStream({
         startOffset: offset,
         endOffset: offset.add(size)
     }) as unknown as Readable);
 
+    console.log(`Got txs ${txs}`);
     for (const [index, innerTx] of txs.entries()) {
         // const txToInsert: Omit<TransactionType, 'data'> = {
         //     data_root: "",
@@ -122,6 +124,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
     new MQ.QueueScheduler(importBundleQueue.name, MQ_REDIS_CONFIG);
 
     new MQ.Worker<ImportBundleJob>(importBundleQueue.name, async function(job) {
+        console.log(`Starting import bundle job - ${JSON.stringify(job.data)}`);
         if (job.data.type === "ANS102") throw new Error("ANS102 not supported");
 
         try {
