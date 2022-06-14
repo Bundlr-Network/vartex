@@ -331,7 +331,7 @@ export const findTxIDsFromTxFilters = async (
 
 
 
-        if (cqlKey === "tag_pairs") {
+        if (cqlKey === "tag_pair") {
           const whereValsString = tagPairs
             .map((tp) => `AND tag_pair CONTAINS ${tp}`)
             .join(" ");
