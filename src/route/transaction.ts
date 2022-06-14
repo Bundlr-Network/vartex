@@ -32,11 +32,9 @@ export async function txUploadRoute(
     console.log(request.headers);
     let result;
     try {
-      result = await axios.post(`${host}/tx`, {
-        followRedirect: true,
-        json: request.body,
+      result = await axios.post(`${host}/tx`, request.body, {
         headers: {
-          "X-Network": process.env.NETWORK === "testnet" ? "arweave.testnet" : undefined
+          "X-Network": process.env.NETWORK
         }
       });
     } catch (error) {
