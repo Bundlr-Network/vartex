@@ -1,21 +1,14 @@
 import * as R from "rambda";
-import PQueue from "p-queue";
 import { types as CassandraTypes } from "cassandra-driver";
-import { MessagesFromParent, MessagesFromWorker } from "./message-types";
 import { UpstreamTag } from "../types/cassandra";
 import { getTransaction, getTxOffset, TransactionType } from "../query/transaction";
 import { ownerToAddress } from "../utility/encoding";
 import {
-  cassandraClient,
   blockMapper,
   tagsMapper,
   transactionMapper,
-  txQueueMapper,
 } from "../database/mapper";
 import { insertTx, toLong } from "../database/utils";
-import { getMessenger } from "../gatsby-worker/child";
-import { mkWorkerLog } from "../utility/log";
-import { env, KEYSPACE } from "../constants";
 import { tagModels } from "../database/tags-mapper";
 import * as MQ from "bullmq";
 import { ImportTxJob, importTxQueue } from "../queue";
@@ -27,23 +20,6 @@ enum TxReturnCode {
   REQUEUE,
   DEQUEUE,
 }
-
-let messenger = getMessenger<MessagesFromParent, MessagesFromWorker>();
-
-if (messenger) {
-  messenger.sendMessage({
-    type: "worker:ready",
-  });
-} else {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (messenger as any) = { sendMessage: console.log };
-}
-
-const log = mkWorkerLog(messenger);
-
-const concurrency = env.PARALLEL_TX_IMPORT;
-
-const queue = new PQueue({ concurrency });
 
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
@@ -93,7 +69,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   const block = await blockMapper.get({ indep_hash: blockHash });
 
   if (!block) {
-    log(
+    console.log(
       `blockHash ${blockHash} has not been imported (or was removed?), therefore not importing ${txId}`
     );
     return TxReturnCode.REQUEUE;
@@ -102,7 +78,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   console.log(`Got block ${block.height}`);
 
   if (!block.txs.includes(txId)) {
-    log(
+    console.log(
       `Abandoned tx detected? It was not found in txs of block ${blockHash}, therefore dequeue-ing ${txId}`
     );
 
@@ -115,12 +91,12 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 
   if (maybeImportedTx && maybeImportedTx?.block_hash !== "PENDING") {
     if (maybeImportedTx.block_hash === blockHash) {
-      log(
+      console.log(
         `Already imported transaction ${txId}! If you want to force a re-import, please remove the old one first.`
       );
       return TxReturnCode.DEQUEUE;
     } else {
-      log(
+      console.log(
         `Misplaced transaction ${txId}! Perhaps block with hash ${maybeImportedTx.block_hash} was abandoned?\n` +
         `Moving on to import the tx to block ${blockHash} at height ${block.height}`
       );
@@ -134,7 +110,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   const tx: TransactionType | undefined = await getTransaction({ txId });
 
   if (!tx) {
-    log(`Failed to fetch ${txId} from nodes`);
+    console.log(`Failed to fetch ${txId} from nodes`);
     return TxReturnCode.REQUEUE;
   }
 
@@ -146,7 +122,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   if (dataSize && dataSize.gt(0)) {
     const maybeTxOffset: { size: string, offset: string } | undefined = await getTxOffset({ txId });
     if (!maybeTxOffset) {
-      log(`Failed to fetch data offset for ${txId} from nodes`);
+      console.log(`Failed to fetch data offset for ${txId} from nodes`);
       return TxReturnCode.REQUEUE;
     } else {
       try {
@@ -157,7 +133,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
         //   offset: maybeTxOffset.offset,
         // });
       } catch (error) {
-        log(JSON.stringify(error));
+        console.log(JSON.stringify(error));
         return TxReturnCode.REQUEUE;
       }
     }
@@ -179,7 +155,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
     console.log(`Inserting gql tags for ${txId}...`);
     await insertGqlTag({ ...tx, tx_index: txIndex, tx_id: tx.id });
   } catch (error) {
-    log(JSON.stringify(error));
+    console.log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
   }
 
@@ -208,80 +184,12 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
       target: tx.target,
     });
   } catch (error) {
-    log(JSON.stringify(error));
+    console.log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
   }
 
   return TxReturnCode.DEQUEUE;
 };
-
-let workerIsWorking = false;
-
-export async function consumeQueueOnce(): Promise<void> {
-  if (!workerIsWorking) {
-    workerIsWorking = true;
-    const result = await cassandraClient.execute(
-      `SELECT * FROM ${KEYSPACE}.tx_queue`,
-      [],
-      { prepare: true }
-    );
-
-    for await (const pendingTx of result) {
-      const callback = async () => {
-        const txImportResult = await importTx(
-          pendingTx.tx_id,
-          pendingTx.block_hash
-        );
-        switch (txImportResult) {
-          case TxReturnCode.OK: {
-            try {
-              await txQueueMapper.remove({ tx_id: pendingTx.tx_id });
-            } catch (error) {
-              log(
-                `tx was imported but encountered error while dequeue-ing ${JSON.stringify(
-                  error
-                )}`
-              );
-            } finally {
-              log(`${pendingTx.tx_id} successfully imported!`);
-            }
-            break;
-          }
-          case TxReturnCode.DEQUEUE: {
-            try {
-              await txQueueMapper.remove({ tx_id: pendingTx.tx_id });
-            } catch {
-              /* logs should've been printed already */
-            }
-            break;
-          }
-          default: {
-            try {
-              await txQueueMapper.update({
-                tx_id: pendingTx.tx_id,
-                last_import_attempt: CassandraTypes.LocalTime.now(),
-                import_attempt_cnt: (pendingTx.import_attempt_cnt || 0) + 1,
-              });
-            } catch (error) {
-              log(
-                `Error encountered while requeue-ing a tx ${JSON.stringify(
-                  error
-                )}`
-              );
-            }
-          }
-        }
-      };
-
-      queue.add(callback);
-    }
-
-    await queue.onIdle();
-    workerIsWorking = false;
-  } else {
-    log(`Can't consume queue while worker is still consuming`);
-  }
-}
 
 
 (async function () {
