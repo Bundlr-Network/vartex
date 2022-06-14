@@ -326,14 +326,14 @@ export const findTxIDsFromTxFilters = async (
           owners: "owner",
           dataRoots: "data_root",
           bundledIn: "bundled_in",
-          tags: "tag_pairs",
+          tags: "tag_pair",
         });
 
 
 
         if (cqlKey === "tag_pairs") {
           const whereValsString = tagPairs
-            .map((tp) => `AND tag_pairs CONTAINS ${tp}`)
+            .map((tp) => `AND tag_pair CONTAINS ${tp}`)
             .join(" ");
           return `${accumulator} ${whereValsString}`;
         } else {
@@ -403,7 +403,7 @@ export const findTxIDsFromTxFilters = async (
         .join(",")}) `;
 
       const whereQuery = isBucketSearchTag
-        ? tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ")
+        ? tagPairs.map((tp) => `AND tag_pair CONTAINS ${tp}`).join(" ")
         : "";
 
       console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
@@ -447,7 +447,7 @@ export const findTxIDsFromTxFilters = async (
     const tagsContainsQuery =
       secondaryTagPairs.length === 0
         ? ""
-        : tagPairs.map((tp) => `AND tag_pairs CONTAINS ${tp}`).join(" ");
+        : tagPairs.map((tp) => `AND tag_pair CONTAINS ${tp}`).join(" ");
 
     console.log("txFilterQ - else if isBucketSearchTag");
 
