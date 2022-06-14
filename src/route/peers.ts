@@ -7,5 +7,5 @@ export async function peers(request: Request, response: Response): Promise<void>
         .then(r => r.body.json());
 
     response.contentType("application/json");
-    response.send([...JSON.parse(process.env.ARWEAVE_NODES).map((r: string) => r.slice(r.indexOf("//") + 1)), ...peers]);
+    response.send([...JSON.parse(process.env.ARWEAVE_NODES).map((r: string) => r.slice(Math.max(r.indexOf("//") + 1, 0))), ...peers]);
 }
