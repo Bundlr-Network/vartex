@@ -18,6 +18,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
     const { offset, size } = await getTxOffset({ txId: bundleTxId, retry: 3 }).then(r => ({ offset: toLong(r.offset), size: toLong(r.size) }));
     const tx = await getTransaction({ txId: bundleTxId, retry: 3 });
     console.log(`Got tx ${tx}`)
+    console.log(processStream);
     const txs = await processStream(getDataFromChunksAsStream({
         startOffset: offset,
         endOffset: offset.add(size)
