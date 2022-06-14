@@ -5,9 +5,17 @@ import {
 } from "cassandra-driver";
 import { KEYSPACE } from "../constants";
 import { Transaction } from "../types/cassandra";
-import { transactionMapper, txMapper, txOffsetMapper, txsSortedAscMapper, txsSortedDescMapper } from "./mapper";
+import {
+  tagsMapper,
+  transactionMapper,
+  txMapper,
+  txOffsetMapper,
+  txsSortedAscMapper,
+  txsSortedDescMapper
+} from "./mapper";
 import { ownerToAddress } from "../utility/encoding";
-import { txModels } from "./tags-mapper";
+import { tagModels, txModels } from "./tags-mapper";
+import { TransactionType } from "../query/transaction";
 
 export const toLong = (
   anyValue: CassandraTypes.Long | number | string | undefined
@@ -39,6 +47,48 @@ export const getMaxHeightBlock = async (
     );
   }
   return lastMaxHeight;
+};
+
+export const insertGqlTag = async (
+    tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long, tx_id: string }
+): Promise<void> => {
+  if (!R.isEmpty(tx.tags)) {
+    console.log(`Importing tags from ${tx.tx_id} - ${JSON.stringify(tx.tags, undefined, 4)}`);
+    for (const tagModelName of Object.keys(tagModels)) {
+      const tagMapper = tagsMapper.forModel(tagModelName);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any,unicorn/prefer-spread
+      const allFields: any = R.concat(commonFields, tagModels[tagModelName]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const environment: any = R.pickAll(allFields, tx);
+
+      // until ans104 comes
+      environment.data_item_index ??= toLong(-1);
+
+      if (
+          typeof environment.owner === "string" &&
+          environment.owner.length > 43
+      ) {
+        environment.owner = ownerToAddress(environment.owner);
+      }
+
+      environment.bundled_in ??= "";
+
+      // console.log(`environment ${environment}`)
+
+      let index = 0;
+      for (const { name, value } of tx.tags) {
+        const [tag_name, tag_value] = [name, value];
+
+        const insertObject = R.merge(environment, {
+          tag_pair: `${tag_name}|${tag_value}`,
+          tag_index: index
+        });
+
+        await tagMapper.insert(insertObject);
+        index += 1;
+      }
+    }
+  }
 };
 
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
