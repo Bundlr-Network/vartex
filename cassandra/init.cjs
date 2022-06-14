@@ -114,6 +114,7 @@ async function connect() {
           tx_id text,
           last_tx text,
           owner text,
+          owner_address text,
           quantity bigint,
           reward bigint,
           signature text,
