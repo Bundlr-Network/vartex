@@ -7,6 +7,7 @@ import Transaction from "arweave/node/lib/transaction";
 import { types } from "cassandra-driver";
 import Tuple = types.Tuple;
 import { importTxQueue } from "../queue";
+import { proxyGetRoute } from "./proxy";
 
 export async function txUploadRoute(
   request: Request,
@@ -80,8 +81,7 @@ export async function txGetByIdRoute(
     });
     console.log(rawTx)
     if (!rawTx) {
-      response.sendStatus(404).end();
-      return
+      return proxyGetRoute(request, response);
     }
 
     rawTx.tags = (rawTx.tags as Array<Tuple>)?.map(e => ({ name: e.get(0), value: e.get(1) })) ?? [];
