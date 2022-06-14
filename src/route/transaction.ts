@@ -32,7 +32,7 @@ export async function txUploadRoute(
       followRedirect: true,
       json: request.body,
       headers: {
-        "X-Network": request.headers["x-network"]
+        "X-Network": process.env.NETWORK === "testnet" ? "arweave.testnet" : undefined
       }
     });
 
