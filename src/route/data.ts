@@ -197,7 +197,6 @@ export async function dataRoute(
 
         for (const [k, v] of Object.entries(res.headers))  response.header(k, v);
         res.data.pipe(response);
-        response.end();
         return;
       } catch {}
 
