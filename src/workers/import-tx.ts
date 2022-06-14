@@ -10,6 +10,7 @@ import { insertGqlTag, insertTx, toLong } from "../database/utils";
 import * as MQ from "bullmq";
 import { importBundleQueue, ImportTxJob, importTxQueue } from "../queue";
 import Transaction from "arweave/node/lib/transaction";
+import { base64url } from "rfc4648";
 
 
 enum TxReturnCode {
@@ -230,7 +231,9 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 function isAns104(tx: Omit<Transaction, 'data'>): boolean {
   let format = false;
   let version = false;
-  for (const tag of tx.tags) {
+  console.log(tx.tags);
+  console.log(tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.parse(t.name).toString(), value: base64url.parse(t.value).toString() })));
+  for (const tag of tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.parse(t.name).toString(), value: base64url.parse(t.value).toString() }))) {
     if (!format && tag.name.toLowerCase() === "bundle-format" && tag.value === "binary") {
       format = true;
       continue;
