@@ -1,6 +1,5 @@
 import * as R from "rambda";
 import { Request, Response, NextFunction } from "express";
-import got from "got";
 import { transactionMapper, txOffsetMapper } from "../database/mapper";
 import { grabNode } from "../query/node";
 import Transaction from "arweave/node/lib/transaction";
@@ -8,6 +7,8 @@ import { types } from "cassandra-driver";
 import Tuple = types.Tuple;
 import { importTxQueue } from "../queue";
 import { proxyGetRoute } from "./proxy";
+import axios from "axios";
+import { makeError } from "./utils";
 
 export async function txUploadRoute(
   request: Request,
@@ -28,31 +29,34 @@ export async function txUploadRoute(
 
     console.log(`${host}/tx`);
 
-    console.log(request.headers)
-    const result = await got.post(`${host}/tx`, {
-      followRedirect: true,
-      json: request.body,
-      headers: {
-        "X-Network": process.env.NETWORK === "testnet" ? "arweave.testnet" : undefined
-      }
-    });
-
-    if ([400, 410].includes(result.statusCode)) {
+    console.log(request.headers);
+    let result;
+    try {
+      result = await axios.post(`${host}/tx`, {
+        followRedirect: true,
+        json: request.body,
+        headers: {
+          "X-Network": process.env.NETWORK === "testnet" ? "arweave.testnet" : undefined
+        }
+      });
+    } catch (error) {
+      console.error(error)
       console.error("[broadcast-tx] failed", {
         id: tx.id,
         host,
-        code: result.statusCode,
-        error: result.statusMessage,
+        code: result.status,
+        error: result.statusText,
       });
       next(
-        "[broadcast-tx] failed: " +
+          "[broadcast-tx] failed: " +
           JSON.stringify({
             id: tx.id,
             host,
-            code: result.statusCode,
-            error: result.statusMessage,
+            code: result.status,
+            error: result.statusText,
           })
       );
+      return makeError(response, 400);
     }
 
     delete tx.data;

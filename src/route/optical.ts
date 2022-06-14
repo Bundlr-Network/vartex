@@ -52,7 +52,7 @@
 //     for (const tx of eventBody) {
 //         await insertGqlTag({
 //             data_root: "",
-//             data_size: innerTx.dataSize,
+//             data_size: tx.dataSize,
 //             data_tree: null,
 //             format: null,
 //             id: innerTx.id,

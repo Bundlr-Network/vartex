@@ -97,7 +97,6 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
                 "bundled_in",
                 "data_size",
                 "tx_id",
-                "owner",
                 "signature",
                 "tags",
                 "tag_count",

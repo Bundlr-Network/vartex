@@ -119,6 +119,7 @@ export const insertTx = async (
         "tx_id",
         "last_tx",
         "owner",
+        "owner_address",
         "quantity",
         "reward",
         "signature",
