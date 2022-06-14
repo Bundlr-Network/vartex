@@ -94,7 +94,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
             bundled_in: bundleTxId,
             data_root: null,
             data_size: innerTx.dataSize,
-            data_tree: null,
+            data_tree: [],
             format: null,
             last_tx: null,
             owner: innerTx.owner,
