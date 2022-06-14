@@ -4,7 +4,7 @@ import processStream from "arbundles/stream";
 import { getTransaction, getTxOffset } from "../query/transaction";
 import { Readable } from "node:stream";
 import { insertTx } from "../database/utils";
-import { types as CassandraTypes } from "cassandra-driver/lib/types";
+import { types as CassandraTypes } from "cassandra-driver";
 import * as R from "rambda";
 import { UpstreamTag } from "../types/cassandra";
 import { insertGqlTag } from "./import-tx";
