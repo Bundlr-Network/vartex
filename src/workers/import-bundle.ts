@@ -28,25 +28,6 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
 
     console.log(`Got txs ${txs}`);
     for (const [index, innerTx] of txs.entries()) {
-        // const txToInsert: Omit<TransactionType, 'data'> = {
-        //     data_root: "",
-        //     data_size: innerTx.dataSize,
-        //     data_tree: null,
-        //     format: -1,
-        //     id: innerTx.id,
-        //     last_tx: null,
-        //     owner: "",
-        //     quantity: "",
-        //     reward: "",
-        //     signature: "",
-        //     tags: innerTx.tags,
-        //     target: ""
-        //
-        // };
-        // const txIndex = toLong(block.height)
-        //     .multiply(1000)
-        //     .add(block.txs.indexOf(bundleTxId));
-
         let tags: CassandraTypes.Tuple[] = [];
 
         if (!R.isEmpty(innerTx.tags) && Array.isArray(innerTx.tags)) {
@@ -65,7 +46,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         try {
             console.log("Inserting gql")
             await insertGqlTag({
-                data_root: "",
+                data_root: null,
                 data_size: innerTx.dataSize,
                 data_tree: null,
                 format: null,

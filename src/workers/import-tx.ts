@@ -8,7 +8,7 @@ import {
 } from "../database/mapper";
 import { insertGqlTag, insertTx, toLong } from "../database/utils";
 import * as MQ from "bullmq";
-import { ImportTxJob, importTxQueue } from "../queue";
+import { importBundleQueue, ImportTxJob, importTxQueue } from "../queue";
 import Transaction from "arweave/node/lib/transaction";
 
 
@@ -136,6 +136,15 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
       tag_count: tags.length,
       target: tx.target,
     });
+
+    if (isAns104(tx)) {
+      console.log(`Found ANS-104 tx ${tx.id}`);
+      await importBundleQueue.add("Import Bundle", {
+        txId: tx.id,
+        blockHeight: tx.height,
+        type: "ANS104"
+      });
+    }
   } catch (error) {
     console.log(JSON.stringify(error));
     return TxReturnCode.REQUEUE;
@@ -156,6 +165,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
         console.log(`Running Import Tx job - ${job.data.tx_id}`);
         try {
           await importTx(job.data.tx_id, job.data.block_hash);
+
         } catch (error) {
           console.error(`Error occurred while importing tx - ${error}`);
         }
@@ -216,3 +226,16 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
   // await importTxScheduler.run();
   // await worker.run();
 })();
+
+function isAns104(tx: Omit<Transaction, 'data'>): boolean {
+  let format = false;
+  let version = false;
+  for (const tag of tx.tags) {
+    if (!format && tag.name.toLowerCase() === "bundle-format" && tag.value === "binary") {
+      format = true;
+      continue;
+    }
+    if (!version && tag.name.toLowerCase() === "bundle-version" && tag.value === "2.0.0") version = true;
+  }
+  return format && version;
+}
