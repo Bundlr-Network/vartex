@@ -30,6 +30,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { importBundleQueue, importTxQueue } from "./queue";
 import bodyParser from "body-parser";
+import { peers } from "./route/peers";
 // import { optical } from "./route/optical";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -178,7 +179,7 @@ export function start(): void {
 
   app.get("/chunk/:offset", proxyGetRoute)
 
-  app.get("/peers", proxyGetRoute);
+  app.get("/peers", peers);
   app.get("/tx_anchor", proxyGetRoute);
 
   // db endpoints
