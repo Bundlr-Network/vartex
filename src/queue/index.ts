@@ -10,7 +10,7 @@ export type ImportBlockJob = { bundleId: number, txId: string } | { bundleId: nu
 export type ImportBundleJob = { type: "ANS102" | "ANS104", tx_id: string };
 export type ExportChunkJob = any;
 
-export const importTxQueue = new MQ.Queue<any>("Import Tx Queue", { connection: MQ_REDIS_CONFIG });
-export const importBundleQueue = new MQ.Queue<ImportBundleJob>("Import Bundle Queue", { connection: MQ_REDIS_CONFIG });
-export const exportChunkQueue = new MQ.Queue<ExportChunkJob>("Export Chunk Queue", { connection: MQ_REDIS_CONFIG });
+export const importTxQueue = new MQ.Queue<any>("Import Tx Queue", MQ_REDIS_CONFIG);
+export const importBundleQueue = new MQ.Queue<ImportBundleJob>("Import Bundle Queue", MQ_REDIS_CONFIG);
+export const exportChunkQueue = new MQ.Queue<ExportChunkJob>("Export Chunk Queue", MQ_REDIS_CONFIG);
 
