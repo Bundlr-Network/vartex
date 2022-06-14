@@ -187,6 +187,7 @@ export async function dataRoute(
     console.log(`Not found in db - ${txId}`);
     try {
       txUpstream = await getTransaction({ txId, retry: 99 });
+      if (!txUpstream) throw new Error("Not found tx from peer");
     } catch {
       console.error(`tx ${txId} wasn't found`);
 

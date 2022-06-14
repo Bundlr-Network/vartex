@@ -40,7 +40,7 @@ export async function getTransaction({
 }: {
   txId: string;
   retry?: number;
-}): Promise<TransactionType | undefined> {
+}): Promise<TransactionType> {
   const tryNode = grabNode();
 
   console.log(`Trying to get ${txId} from ${tryNode}`);

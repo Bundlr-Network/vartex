@@ -114,8 +114,8 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
                 "tags",
                 "tag_count",
                 "target",
-        ] : undefined
-    });
+            ] : undefined
+        });
     }
 }
 
