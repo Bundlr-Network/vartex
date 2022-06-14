@@ -19,7 +19,9 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
     const tx = await getTransaction({ txId: bundleTxId, retry: 3 });
     console.log(`Got tx ${tx}`)
     console.log(processStream);
-    const txs = await processStream(getDataFromChunksAsStream({
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const txs = await processStream.default(getDataFromChunksAsStream({
         startOffset: offset,
         endOffset: offset.add(size)
     }) as unknown as Readable);
