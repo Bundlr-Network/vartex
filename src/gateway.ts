@@ -30,7 +30,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { importBundleQueue, importTxQueue } from "./queue";
 import bodyParser from "body-parser";
-import { optical } from "./route/optical";
+// import { optical } from "./route/optical";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const { default: expressPlayground } = gpmeImport as any;
@@ -205,7 +205,7 @@ export function start(): void {
       schemaPolling: false,
     });
 
-    app.post("/bundlr/optical", optical);
+    // app.post("/bundlr/optical", optical);
 
     // Everything else
     app.all("*", (request: Request, response: Response) => {

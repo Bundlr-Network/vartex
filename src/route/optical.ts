@@ -6,7 +6,8 @@ const pks = new Set([
     "pGFsvdSB9sxbwU5L4HD2v12DK40kzZ5N69s6WlI3Uw9pFdHMHei3n1Tv4jvZqU9yeIMGsS60MQRvfJK1AEoNYsQqk4Rciajw0_IemZdwlt4u4voDALRalrQ3NV4knOlHRY11anqV0fNhikWCsiRPukIRZrdcFfqzFr0boH8bou7DgESNvWxROOxSC149oKxJ06FQsBDaIeElBsR8qTddybvXqMagXCM9y_HNrtAoz_8LgPjQtK5LFEbXhh9PyI_GOuoHyzJUc9Sm-V9kCB4kTm-SHrPbETQnvejZBcqEHxNcDNWBv6CWjj3-0V3dFMhjM1cy14d0Lm4j0IyRLm9bHM3s0ssVDd20gjWyar-D0o6guJIrteEC7UGR-w1yvXoGuIwdfZeoSAZ_CU9FrOJfQCTDs2aLgdCNeYKXg0Rt8YZL_elZnG7utCkO78TwxbGqear_I-1dlO39CUlo13YSS6pPonioWqkzXcXh93G7BYjgUxcPJ31kLyr2wBRA4OObAYRvh-5V3TkULlmwR4Q0pV3cUeOLI94b4WhaDZDI_RIJiCXQvtGy190NqTBeVogPrrAXLFkK0E013GByHrmzZoELfSUorjK-bDk4wXxdbVqzY7KXP-NEt3Bu-woinbUf56i3DXLrYlwINYK39VUydGpcQLZ5EDCL4u_IL_iFPt0",
 ]);
 
-export async function optical(request: Request, response: Response): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function optical(request: Request, response: Response): Promise<void> {
     const publicKey =
         request.headers["X-Bundlr-Public-Key"] ||
         request.headers["x-bundlr-public-key"];
