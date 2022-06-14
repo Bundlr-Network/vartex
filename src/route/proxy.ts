@@ -3,7 +3,7 @@ import { grabNode } from "../query/node";
 // import * as undici from "undici";
 import axios from "axios";
 
-export async function proxyGetRoute(request: Request, response: Response): void {
+export async function proxyGetRoute(request: Request, response: Response): Promise<void> {
   const uri = `${grabNode()}${request.originalUrl}`;
   const stream = await axios.get(uri, { headers: request.headers as Record<string, string>, responseType: "stream" });
   stream.data.on("error", (e: any) => {
