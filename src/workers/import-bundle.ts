@@ -132,7 +132,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         if (job.data.type === "ANS102") throw new Error("ANS102 not supported");
 
         try {
-            await importBundle(job.data.tx_id, 0)
+            await importBundle(job.data.txId, job.data.blockHeight);
             // await importBundle(job.data.tx_id, job.data.block_hash, job.data.block_height);
         } catch (error) {
             console.error(`Error occurred while importing tx - ${error}`);
