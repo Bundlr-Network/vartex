@@ -53,7 +53,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            tags = tx.tags.map(({ name, value }: UpstreamTag) => CassandraTypes.Tuple.fromArray([name, value]));
+            tags = innerTx.tags.map(({ name, value }: UpstreamTag) => CassandraTypes.Tuple.fromArray([name, value]));
         }
 
         const txx = await transactionMapper.get({ tx_id: innerTx.id });

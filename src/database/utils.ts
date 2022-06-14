@@ -79,6 +79,8 @@ export const insertGqlTag = async (
       for (const { name, value } of tx.tags) {
         const [tag_name, tag_value] = [name, value];
 
+        if (allFields.includes("data_root")) environment.data_root ??= "";
+
         const insertObject = R.merge(environment, {
           tag_pair: `${tag_name}|${tag_value}`,
           tag_index: index
