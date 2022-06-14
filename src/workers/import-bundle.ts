@@ -120,9 +120,9 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
 
 
 (async function () {
-    const importBundleScheduler = new MQ.QueueScheduler(importBundleQueue.name, MQ_REDIS_CONFIG);
+    new MQ.QueueScheduler(importBundleQueue.name, MQ_REDIS_CONFIG);
 
-    const worker = new MQ.Worker<ImportBundleJob>(importBundleQueue.name, async function(job) {
+    new MQ.Worker<ImportBundleJob>(importBundleQueue.name, async function(job) {
         if (job.data.type === "ANS102") throw new Error("ANS102 not supported");
 
         try {
@@ -133,6 +133,6 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         }
     }, MQ_REDIS_CONFIG);
 
-    await importBundleScheduler.run();
-    await worker.run();
+    // await importBundleScheduler.run();
+    // await worker.run();
 })();
