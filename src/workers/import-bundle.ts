@@ -65,7 +65,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         try {
             console.log("Inserting gql")
             await insertGqlTag({
-                data_root: null,
+                data_root: "",
                 data_size: innerTx.dataSize,
                 data_tree: null,
                 format: null,
