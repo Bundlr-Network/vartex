@@ -99,6 +99,8 @@ export const insertTx = async (
       transactionMapper?: string[]
     }
 ): Promise<void> => {
+
+  console.log(JSON.stringify(tx, null, 4));
   const data_item_index = tx.data_item_index ?? toLong(-1);
   try {
     await transactionMapper.update(tx, {
