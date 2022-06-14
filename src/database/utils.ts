@@ -44,12 +44,15 @@ export const getMaxHeightBlock = async (
 const commonFields = ["tx_index", "data_item_index", "tx_id"];
 
 export const insertTx = async (
-    tx: Transaction & { data_item_index?: CassandraTypes.Long, offset?: CassandraTypes.Long }
+    tx: Transaction & { data_item_index?: CassandraTypes.Long, offset?: CassandraTypes.Long },
+    fieldsOpts?: {
+      transactionMapper?: string[]
+    }
 ): Promise<void> => {
   const data_item_index = tx.data_item_index ?? toLong(-1);
   try {
     await transactionMapper.update(tx, {
-      fields: [
+      fields: fieldsOpts?.transactionMapper ?? [
           "tx_index",
         "data_item_index",
         "block_height",

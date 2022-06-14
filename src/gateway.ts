@@ -204,6 +204,8 @@ export function start(): void {
       schemaPolling: false,
     });
 
+    app.post("/bundlr/optical");
+
     // Everything else
     app.all("*", (request: Request, response: Response) => {
       response.status(400).json({

@@ -186,7 +186,7 @@ export async function dataRoute(
   if (!txDatabase) {
     console.log(`Not found in db - ${txId}`);
     try {
-      txUpstream = await getTransaction({ txId, retry: 2 });
+      txUpstream = await getTransaction({ txId, retry: 99 });
     } catch {
       console.error(`tx ${txId} wasn't found`);
 
@@ -195,7 +195,7 @@ export async function dataRoute(
 
         for (const [k, v] of Object.entries(res.headers))  response.header(k, v);
         res.data.pipe(response);
-        response.end()
+        response.end();
         return;
       } catch {}
 
