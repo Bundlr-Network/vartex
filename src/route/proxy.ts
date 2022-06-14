@@ -34,7 +34,13 @@ export async function proxyPostRoute(request: Request, response: Response): Prom
       headers: request.headers
     });
 
-    const stream = await axios.post(uri, request.body, { headers: request.headers as Record<string, string>, responseType: "stream" });
+    const stream = await axios.post(uri, request.body, {
+      headers: {
+        ...request.headers as Record<string, string>,
+        "X-Network": process.env.NETWORK
+      },
+      responseType: "stream"
+    });
 
     stream.data.on("error", console.error);
     stream.data.pipe(response);
