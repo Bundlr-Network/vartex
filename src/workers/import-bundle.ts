@@ -80,11 +80,14 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
                 tx_id: innerTx.id,
                 tx_index
             });
+            console.log("Inserted gql")
+
         } catch (error) {
             console.error(JSON.stringify(error));
             throw error;
         }
 
+        console.log("Inserting tx")
         await insertTx({
             block_hash: block.indep_hash,
             block_height: toLong(block.height),
@@ -120,6 +123,9 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
                 "target",
             ] : undefined
         });
+
+        console.log("Inserted tx")
+
     }
 }
 
