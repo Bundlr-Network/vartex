@@ -11,7 +11,6 @@ import { insertGqlTag } from "./import-tx";
 import { getBlock } from "../query/block";
 import { toLong } from "../database/cassandra";
 import { getDataFromChunksAsStream } from "../query/node";
-import { Tag } from "arweave/node/lib/transaction";
 import { transactionMapper } from "../database/mapper";
 import { MQ_REDIS_CONFIG } from "../queue/config";
 
@@ -95,7 +94,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
             reward: null,
             signature: innerTx.signature,
             tag_count: innerTx.tags.length,
-            tags: innerTx.tags.map((t: Tag) => CassandraTypes.Tuple.fromArray([t.name, t.value])),
+            tags,
             target: innerTx.target,
             tx_id: innerTx.id,
             tx_index,
