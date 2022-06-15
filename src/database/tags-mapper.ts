@@ -6,7 +6,8 @@ const { Mapper } = mapping;
 export const txModels: Record<string, string[]> = {
   Owner: ["owner"],
   Target: ["target"],
-  OwnerAndTarget: ["owner", "target"]
+  OwnerAndTarget: ["owner", "target"],
+  BundledIn: ["bundled_in"]
 };
 
 export const tagModels: Record<string, string[]> = {
@@ -75,7 +76,8 @@ export const tagModels: Record<string, string[]> = {
   ],
 };
 
-export const makeTxMapper = (cassandraClient: CassandraClient): any =>
+export const makeTx
+Mapper = (cassandraClient: CassandraClient): any =>
     new Mapper(cassandraClient, {
       models: {
         Owner: {

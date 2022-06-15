@@ -197,6 +197,8 @@ export async function dataRoute(
         const res = await axios.get(`${process.env.BUNDLR_NODE}/tx/${txId}/data`, { responseType: "stream" });
 
         for (const [k, v] of Object.entries(res.headers))  response.header(k, v);
+
+
         res.data.pipe(response);
         return;
       } catch {}
