@@ -88,7 +88,7 @@ export const insertGqlTag = async (
         });
 
         console.log(insertObject);
-        console.log(allFields);
+        console.log(tagMapper.name);
 
         await tagMapper.insert(insertObject);
         index += 1;
