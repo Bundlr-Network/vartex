@@ -22,6 +22,7 @@ import { getDataFromChunksAsStream } from "../query/node";
 import { utf8DecodeTag, utf8DecodeTupleTag } from "../utility/encoding";
 import axios from "axios";
 import { toLong } from "../database/utils";
+import { makeError } from "./utils";
 
 // class B64Transform extends Transform {
 //   protected iterLength: number;
@@ -302,7 +303,14 @@ export async function dataRoute(
     //   response.end();
     // });
 
-    const stream = Readable.from(getDataFromChunksAsStream({ startOffset: toLong(startOffset), endOffset: toLong(endOffset) }));
+
+    let stream;
+    try {
+      stream = Readable.from(getDataFromChunksAsStream({ startOffset: toLong(startOffset), endOffset: toLong(endOffset) }));
+    } catch (error) {
+      console.error(`Error occurred while data ${txId} - ${error}`);
+      return makeError(response, 404);
+    }
 
     // recurNextChunk(response, pipeline, endOffset, startOffset);
 
