@@ -17,13 +17,13 @@ export async function optical(request: Request, response: Response): Promise<voi
     //     request.headers["x-bundlr-public-key"];
     // if (!pks.has(publicKey as string)) return makeError(response, 400);
 
-    let eventBody;
-    try {
-        eventBody = JSON.parse(request.body);
-    } catch {
-        console.log("DEBUG", "Can't parse JSON");
-        return makeError(response, 400);
-    }
+    const eventBody = request.body;
+    // try {
+    //     eventBody = JSON.parse(request.body);
+    // } catch {
+    //     console.log("DEBUG", "Can't parse JSON");
+    //     return makeError(response, 400);
+    // }
 
     if (!Array.isArray(eventBody)) {
         console.log("DEBUG", "Not an array :(");

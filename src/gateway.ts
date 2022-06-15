@@ -206,7 +206,7 @@ export function start(): void {
       schemaPolling: false,
     });
 
-    app.post("/bundlr/optical", optical);
+    app.post("/bundlr/optical", jsonBodyParser, optical);
     // app.post("/preweave/optical", optical);
 
     // Everything else
