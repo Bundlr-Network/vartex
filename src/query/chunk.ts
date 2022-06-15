@@ -29,6 +29,8 @@ export async function getChunk({
   const nodeGrab = forEachNode(retryCount);
   const mayebeMissingProtocol = nodeGrab.startsWith("http") ? "" : "http://";
 
+  console.log(`Getting ${mayebeMissingProtocol}${nodeGrab}/chunk/${offset}`);
+
   const chunkResponse: ChunkResponse | void = (await got
     .get(`${mayebeMissingProtocol}${nodeGrab}/chunk/${offset}`, {
       responseType: "json",
