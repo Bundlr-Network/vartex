@@ -231,6 +231,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
 function isAns104(tx: Omit<Transaction, 'data'>): boolean {
   let format = false;
   let version = false;
+  console.log(tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.decode(t.name), value: base64url.decode(t.value) })));
   for (const tag of tx.tags.map((t: { name: string; value: string; }) => ({ name: base64url.decode(t.name), value: base64url.decode(t.value) }))) {
     if (!format && tag.name.toLowerCase() === "bundle-format" && tag.value === "binary") {
       format = true;
