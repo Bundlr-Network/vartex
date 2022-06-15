@@ -55,6 +55,7 @@ export interface Transaction {
   tx_id: string;
   last_tx: string;
   owner: string;
+  owner_address?: string;
   quantity: CassandraTypes.Long;
   reward: CassandraTypes.Long;
   signature: string;
