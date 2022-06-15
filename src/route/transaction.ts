@@ -16,7 +16,6 @@ export async function txUploadRoute(
   next: NextFunction
 ): Promise<void> {
   try {
-    console.log(request.body);
     const tx = request.body as Transaction;
     if (!tx) {
       console.log("No tx provided");
@@ -29,7 +28,6 @@ export async function txUploadRoute(
 
     console.log(`${host}/tx`);
 
-    console.log(request.headers);
     let result;
     try {
       result = await axios.post(`${host}/tx`, request.body, {
@@ -81,7 +79,7 @@ export async function txGetByIdRoute(
     const rawTx = await transactionMapper.get({
       tx_id: txId,
     });
-    console.log(rawTx)
+
     if (!rawTx) {
       return proxyGetRoute(request, response);
     }

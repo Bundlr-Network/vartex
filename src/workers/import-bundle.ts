@@ -130,6 +130,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
             // await importBundle(job.data.tx_id, job.data.block_hash, job.data.block_height);
         } catch (error) {
             console.error(`Error occurred while importing tx - ${error}`);
+            throw error;
         }
     }, { ...MQ_REDIS_CONFIG, concurrency: 5 });
 

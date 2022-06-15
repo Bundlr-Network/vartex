@@ -126,14 +126,10 @@ export async function dataRoute(
   request: Partial<Request & { txid?: string }>,
   response: Response
 ): Promise<void> {
-  console.log("HIT");
 
   let firstPath: string = request.params.txid;
   let subPath: string;
 
-  console.log(request.txid);
-  console.log(request.params);
-  console.log(request.path);
 
   if (!firstPath || firstPath?.match(/[\w-]{43}/i)?.length === 0) {
     // sandbox-mode
@@ -220,8 +216,6 @@ export async function dataRoute(
 
   if (offset) {
     console.log(`Got offset - ${txId}`);
-    console.log(`txDatabase - ${JSON.stringify(txDatabase, undefined, 4)}`);
-    console.log(`txUpstream - ${txUpstream}`);
     const tags = txUpstream
       ? txUpstream.tags.map(utf8DecodeTag)
       : txDatabase.tags.map(utf8DecodeTupleTag);
@@ -281,8 +275,6 @@ export async function dataRoute(
       "Content-Type": contentType || "text/plain",
       "Content-Length": size,
     });
-
-    console.log(size, endOffset, startOffset);
 
     // const b64Transform = new B64Transform(startOffset);
     // const streamJsonParser = StreamJson.parser();
