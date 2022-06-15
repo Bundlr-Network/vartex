@@ -416,7 +416,7 @@ export const findTxIDsFromTxFilters = async (
               } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
               { prepare: true }
             ).then(r => r.rows),
-          pendingFilter ? await cassandraClient.execute(
+          pendingFilter && txsMinHeight === -1 ? await cassandraClient.execute(
         `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
               } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
               { prepare: true }
@@ -458,7 +458,7 @@ export const findTxIDsFromTxFilters = async (
         await cassandraClient.execute(
       `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`).then(r => r.rows),
-        pendingFilter ? await cassandraClient.execute(
+        pendingFilter && txsMinHeight === -1 ? await cassandraClient.execute(
       `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${tagEqualsQuery} ${tagsContainsQuery} ${idsFilter} ${targetFilter} LIMIT ${limit + 1
       } ALLOW FILTERING`).then(r => r.rows)
             : Promise.resolve([] as Row[])
@@ -476,7 +476,7 @@ export const findTxIDsFromTxFilters = async (
     const txFilterQ = await Promise.all([
         await cassandraClient.execute(
       `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereClause} LIMIT ${limit + 1}`).then(r => r.rows),
-        pendingFilter ?
+        pendingFilter && txsMinHeight === -1 ?
             await cassandraClient.execute(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereClause} LIMIT ${limit + 1}`).then(r => r.rows)
             : Promise.resolve([] as Row[])
     ]);
