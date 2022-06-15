@@ -307,12 +307,14 @@ export async function dataRoute(
     let stream;
     try {
       stream = Readable.from(getDataFromChunksAsStream({ startOffset: toLong(startOffset), endOffset: toLong(endOffset) }));
+      stream.on("error", (error) => {
+        console.error(`Error occurred while data ${txId} - ${error}`);
+        return makeError(response, 404);
+      })
     } catch (error) {
       console.error(`Error occurred while data ${txId} - ${error}`);
       return makeError(response, 404);
     }
-
-    // recurNextChunk(response, pipeline, endOffset, startOffset);
 
     stream.pipe(response);
   } else {
