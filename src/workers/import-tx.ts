@@ -11,6 +11,7 @@ import * as MQ from "bullmq";
 import { importBundleQueue, ImportTxJob, importTxQueue } from "../queue";
 import Transaction from "arweave/node/lib/transaction";
 import base64url from "base64url";
+import { MQ_REDIS_CONFIG } from "../queue/config";
 
 
 enum TxReturnCode {
@@ -220,7 +221,7 @@ export const importTx = async (txId: string, blockHash: string): Promise<TxRetur
         throw new Error(`Invalid job put in queue - ${job.name}`);
       }
     }
-  });
+  }, { ...MQ_REDIS_CONFIG, concurrency: 5 });
   console.log(importTxScheduler.name);
   console.log(worker.name);
 

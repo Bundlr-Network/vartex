@@ -121,7 +121,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
 (async function () {
     new MQ.QueueScheduler(importBundleQueue.name, MQ_REDIS_CONFIG);
 
-    new MQ.Worker<ImportBundleJob>(importBundleQueue.name, async function(job) {
+    new MQ.Worker<ImportBundleJob>(importBundleQueue.name,async function(job) {
         console.log(`Starting import bundle job - ${JSON.stringify(job.data)}`);
         if (job.data.type === "ANS102") throw new Error("ANS102 not supported");
 
@@ -131,7 +131,7 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         } catch (error) {
             console.error(`Error occurred while importing tx - ${error}`);
         }
-    }, MQ_REDIS_CONFIG);
+    }, { ...MQ_REDIS_CONFIG, concurrency: 5 });
 
     // await importBundleScheduler.run();
     // await worker.run();
