@@ -91,17 +91,6 @@ export const blockImportWorkerPool = new WorkerPool<
   env: processEnv,
 });
 
-appendWorkerReadyPromises("import-txs", env.PARALLEL_TX_IMPORT + 1);
-
-export const txsImportWorkerPool = new WorkerPool<
-  typeof import("../workers/main")
->(process.cwd() + "/src/workers/main", {
-  workerPoolPrefix: "import-txs",
-  numWorkers: env.PARALLEL_TX_IMPORT + 1,
-  logFilter,
-  env: processEnv,
-});
-
 appendWorkerReadyPromises("import-manifest", env.PARALLEL_MANIFEST_IMPORT + 1);
 
 export const manifestImportWorkerPool = new WorkerPool<
