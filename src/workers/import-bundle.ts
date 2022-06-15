@@ -16,6 +16,8 @@ import { MQ_REDIS_CONFIG } from "../queue/config";
 async function importBundle(bundleTxId: string, blockHeight: number) {
     const block = await getBlock({ height: blockHeight });
     const { offset, size } = await getTxOffset({ txId: bundleTxId, retry: 3 }).then(r => ({ offset: toLong(r.offset), size: toLong(r.size) }));
+    const endOffset = offset
+    const startOffset = endOffset.sub(size).add(1);
     const tx = await getTransaction({ txId: bundleTxId, retry: 3 });
     console.log(`Got tx ${tx}`)
     console.log(processStream);
@@ -24,8 +26,8 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         txs = await processStream.default(getDataFromChunksAsStream({
-            startOffset: offset,
-            endOffset: offset.add(size)
+            startOffset,
+            endOffset
         }) as unknown as Readable);
     } catch (error) {
         console.error(`Error occurred while indexing bundle - ${error}`);
