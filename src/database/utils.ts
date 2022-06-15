@@ -72,9 +72,6 @@ export const insertGqlTag = async (
         environment.owner = ownerToAddress(environment.owner);
       }
 
-
-      // console.log(`environment ${environment}`)
-
       let index = 0;
       for (const { name, value } of tx.tags) {
         const [tag_name, tag_value] = [name, value];
@@ -86,9 +83,6 @@ export const insertGqlTag = async (
           tag_pair: `${tag_name}|${tag_value}`,
           tag_index: index
         });
-
-        console.log(insertObject);
-        console.log(tagMapper.name);
 
         await tagMapper.insert(insertObject);
         index += 1;
@@ -192,6 +186,10 @@ export const insertTx = async (
       // }), undefined, {
       //   logged: true
       // });
+
+      console.log(txxMapper.name)
+      console.log(environment);
+      console.log([ ...fields, "tx_index", "data_item_index", "tag_pairs"]);
 
       await txxMapper.update(R.merge(environment, {
         tag_pairs: tags
