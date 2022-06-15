@@ -50,7 +50,7 @@ export const getMaxHeightBlock = async (
 };
 
 export const insertGqlTag = async (
-    tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long, tx_id: string }
+    tx: Omit<TransactionType, 'data'> & { tx_index: CassandraTypes.Long, tx_id: string, owner_address?: string }
 ): Promise<void> => {
   if (!R.isEmpty(tx.tags)) {
     console.log(`Importing tags from ${tx.tx_id} - ${JSON.stringify(tx.tags, undefined, 4)}`);
@@ -64,14 +64,14 @@ export const insertGqlTag = async (
       // until ans104 comes
       environment.data_item_index ??= toLong(-1);
 
-      if (
+      if (tx.owner_address) environment.owner = tx.owner_address;
+      else if (
           typeof environment.owner === "string" &&
           environment.owner.length > 43
       ) {
         environment.owner = ownerToAddress(environment.owner);
       }
 
-      environment.bundled_in ??= "";
 
       // console.log(`environment ${environment}`)
 
@@ -80,6 +80,7 @@ export const insertGqlTag = async (
         const [tag_name, tag_value] = [name, value];
 
         if (allFields.includes("data_root")) environment.data_root ??= "";
+        if (allFields.includes("bundled_in")) environment.bundled_in ??= "";
 
         const insertObject = R.merge(environment, {
           tag_pair: `${tag_name}|${tag_value}`,
