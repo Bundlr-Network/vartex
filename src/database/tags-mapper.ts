@@ -76,8 +76,7 @@ export const tagModels: Record<string, string[]> = {
   ],
 };
 
-export const makeTx
-Mapper = (cassandraClient: CassandraClient): any =>
+export const makeTxMapper = (cassandraClient: CassandraClient): any =>
     new Mapper(cassandraClient, {
       models: {
         Owner: {
