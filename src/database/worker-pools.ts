@@ -113,27 +113,6 @@ export const manifestImportWorkerPool = new WorkerPool<
   env: processEnv,
 });
 
-appendWorkerReadyPromises("import-ans102", env.PARALLEL_ANS102_IMPORT + 1);
-
-export const ans102ImportWorkerPool = new WorkerPool<
-  typeof import("../workers/main")
->(process.cwd() + "/src/workers/main", {
-  workerPoolPrefix: "import-ans102",
-  numWorkers: env.PARALLEL_ANS102_IMPORT + 1,
-  logFilter,
-  env: processEnv,
-});
-
-appendWorkerReadyPromises("import-ans104", env.PARALLEL_ANS104_IMPORT + 1);
-
-export const ans104ImportWorkerPool = new WorkerPool<
-  typeof import("../workers/main")
->(process.cwd() + "/src/workers/main", {
-  workerPoolPrefix: "import-ans104",
-  numWorkers: env.PARALLEL_ANS104_IMPORT + 1,
-  logFilter,
-  env: processEnv,
-});
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 (blockImportWorkerPool.onMessage as any)(onWorkerMessage);
@@ -141,7 +120,3 @@ export const ans104ImportWorkerPool = new WorkerPool<
 (txsImportWorkerPool.onMessage as any)(onWorkerMessage);
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 (manifestImportWorkerPool.onMessage as any)(onWorkerMessage);
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-(ans102ImportWorkerPool.onMessage as any)(onWorkerMessage);
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-(ans104ImportWorkerPool.onMessage as any)(onWorkerMessage);
