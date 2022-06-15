@@ -90,6 +90,10 @@ export const makeTxMapper = (cassandraClient: CassandraClient): any =>
         OwnerAndTarget: {
           keyspace: KEYSPACE,
           tables: ["tx_gql_by_owner_target_asc", "tx_gql_by_owner_target_desc"]
+        },
+        BundledIn: {
+          keyspace: KEYSPACE,
+          tables: ["tx_gql_by_bundled_in_asc", "tx_gql_by_bundled_in_desc"]
         }
       }
     })
