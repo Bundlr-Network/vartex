@@ -21,10 +21,16 @@ async function importBundle(bundleTxId: string, blockHeight: number) {
     console.log(processStream);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const txs = await processStream.default(getDataFromChunksAsStream({
-        startOffset: offset,
-        endOffset: offset.add(size)
-    }) as unknown as Readable);
+    let txs;
+    try {
+        txs = await processStream.default(getDataFromChunksAsStream({
+            startOffset: offset,
+            endOffset: offset.add(size)
+        }) as unknown as Readable);
+    } catch (error) {
+        console.error(`Error occurred while indexing bundle - ${error}`);
+        throw error;
+    }
 
     console.log(`Got txs ${txs}`);
     for (const [index, innerTx] of txs.entries()) {
