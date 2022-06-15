@@ -106,6 +106,4 @@ export const manifestImportWorkerPool = new WorkerPool<
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 (blockImportWorkerPool.onMessage as any)(onWorkerMessage);
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-(txsImportWorkerPool.onMessage as any)(onWorkerMessage);
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 (manifestImportWorkerPool.onMessage as any)(onWorkerMessage);
