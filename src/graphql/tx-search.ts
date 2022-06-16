@@ -271,8 +271,10 @@ export const findTxIDsFromTxFilters = async (
     typeof maybeCursor.txIndex !== "undefined" &&
       sortOrder === "HEIGHT_ASC" &&
       toLong(maybeCursor.txIndex).gt(toLong(txsMinHeight_))
-      ? maybeCursor.txIndex
-      : txsMinHeight_;
+      ? +maybeCursor.txIndex
+      : +txsMinHeight_;
+
+  console.log(`txsMinHeight ${txsMinHeight}`);
 
   const txsMaxHeight_ =
     typeof queryParameters.block === "object" &&
@@ -282,8 +284,10 @@ export const findTxIDsFromTxFilters = async (
 
   const txsMaxHeight =
     typeof maybeCursor.txIndex !== "undefined" && sortOrder === "HEIGHT_DESC"
-      ? maybeCursor.txIndex
-      : txsMaxHeight_;
+      ? +maybeCursor.txIndex
+      : +txsMaxHeight_;
+
+  console.log(`txsMaxHeight ${txsMaxHeight}`);
 
   if (queryParameters.first === 0) {
     return [[], false];
