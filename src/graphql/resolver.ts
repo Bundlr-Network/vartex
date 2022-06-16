@@ -201,7 +201,6 @@ export const resolvers = {
       const txsClean = R.reject(R.isNil)(txs);
       const edges = (await Promise.all(
         txsClean.map(async ({ tx, cursor }) => {
-          console.log("Getting")
           let block = {};
           if (wantsBlock && tx.block_hash) {
             const qResult = await cassandraClient.execute(
@@ -209,9 +208,6 @@ export const resolvers = {
             );
             block = qResult.rows[0] || {};
           }
-
-          console.log("Got")
-          console.log(block)
 
           return {
             cursor,

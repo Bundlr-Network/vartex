@@ -185,8 +185,6 @@ export const findTxIDsFromTxFilters = async (
   const limit = Math.min(100, queryParameters.first || 10);
 
   if (queryParameters.ids?.length > 0 && !queryParameters.tags?.length) {
-    console.log(`SELECT * FROM ${KEYSPACE}.transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') LIMIT ${limit + 1}`);
-    console.log(txFilterKeys);
     const results = await cassandraClient.execute(`SELECT * FROM ${KEYSPACE}.transaction WHERE tx_id IN ('${queryParameters.ids.join("','")}') LIMIT ${limit + 1}`)
         .then(r => filterIdResults(r.rows, txFilterKeys, queryParameters));
 
@@ -207,8 +205,6 @@ export const findTxIDsFromTxFilters = async (
     return [txSearchResult, results.length > limit];
   }
 
-  console.log("txFilterKeys", txFilterKeys)
-
   const sortOrder =
     queryParameters.sort === "HEIGHT_ASC" ? "HEIGHT_ASC" : "HEIGHT_DESC";
   const isBucketSearchTag = Boolean(
@@ -218,12 +214,12 @@ export const findTxIDsFromTxFilters = async (
     (R.isEmpty(txFilterKeys) || R.equals(txFilterKeys, ["ids"])) && R.isEmpty(queryParameters.tags || [])
   );
 
-  console.log(`R.isEmpty(txFilterKeys) ${R.isEmpty(txFilterKeys)}`);
-  console.log(`R.equals(txFilterKeys, ["ids"]) ${R.equals(txFilterKeys, ["ids"])}`);
-  console.log(`queryParameters.tags ${JSON.stringify(queryParameters.tags)}`);
-  console.log(`R.isEmpty(queryParameters.tags) ${R.isEmpty(queryParameters.tags)}`);
-  console.log(`isBucketSearchTag ${isBucketSearchTag}`);
-  console.log(`isBucketSearchTx ${isBucketSearchTx}`);
+  // console.log(`R.isEmpty(txFilterKeys) ${R.isEmpty(txFilterKeys)}`);
+  // console.log(`R.equals(txFilterKeys, ["ids"]) ${R.equals(txFilterKeys, ["ids"])}`);
+  // console.log(`queryParameters.tags ${JSON.stringify(queryParameters.tags)}`);
+  // console.log(`R.isEmpty(queryParameters.tags) ${R.isEmpty(queryParameters.tags)}`);
+  // console.log(`isBucketSearchTag ${isBucketSearchTag}`);
+  // console.log(`isBucketSearchTx ${isBucketSearchTx}`);
 
   let table = "tx_tag_gql";
   if (isBucketSearchTag) {
@@ -237,7 +233,7 @@ export const findTxIDsFromTxFilters = async (
   } else if (isBucketSearchTx) table = sortOrder === "HEIGHT_ASC" ? "txs_sorted_asc" : "txs_sorted_desc";
   else table = filtersToTable[sortOrder][tableKey];
 
-  console.log(`table ${table}`);
+  // console.log(`table ${table}`);
   
   const cursorQuery =
     queryParameters.after &&
@@ -309,7 +305,7 @@ export const findTxIDsFromTxFilters = async (
     ? txFilterKeys
     : R.append("tags", txFilterKeys);
 
-  console.log(txFilterKeys)
+  // console.log(txFilterKeys)
 
   const whereClause =
     (isBucketSearchTag || isBucketSearchTx)
@@ -350,20 +346,20 @@ export const findTxIDsFromTxFilters = async (
         }
       }, "");
 
-  console.log(`whereClause ${whereClause}`);
+  // console.log(`whereClause ${whereClause}`);
 
 
   let hasNextPage = false;
   let txsFilterRows: Row[] = [];
 
-  console.log(queryParameters.block);
+  // console.log(queryParameters.block);
 
-  console.log(Boolean(queryParameters.block?.min || queryParameters.block?.max));
+  // console.log(Boolean(queryParameters.block?.min || queryParameters.block?.max));
   const pendingFilter = (queryParameters.block?.min || queryParameters.block?.max)
     ? ""
       : "tx_index = -1";
 
-  console.log(pendingFilter);
+  // console.log(pendingFilter);
 
   if (isBucketSearchTx) {
     const xBuckets = toLong(txsMaxHeight).div(1e6).add(1);
@@ -410,8 +406,8 @@ export const findTxIDsFromTxFilters = async (
         ? tagPairs.map((tp) => `AND tag_pair CONTAINS ${tp}`).join(" ")
         : "";
 
-      console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
-      } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
+      // console.log(`// SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
+      // } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
 
       console.log(pendingFilter && txsMinHeight === -1);
       console.log(pendingFilter && txsMinHeight === -1 ? await cassandraClient.execute(
@@ -500,7 +496,6 @@ export const findTxIDsFromTxFilters = async (
     hasNextPage = txFilterQ.length > limit;
   }
 
-  console.log(txsFilterRows);
   const cursors = txsFilterRows.slice(1, limit + 1).map((row) =>
     encodeCursor({
       sortOrder,
@@ -528,11 +523,11 @@ function filterIdResults(results: Row[], filterKeys: string[], queryParameters: 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const qp = queryParameters[key] || queryParameters["recipients"];
-      console.log(row)
-      console.log(filterToColumn)
-      console.log(key)
-      console.log(qp);
-      console.log(row[key] || row[filterToColumn[key]]);
+      // console.log(row)
+      // console.log(filterToColumn)
+      // console.log(key)
+      // console.log(qp);
+      // console.log(row[key] || row[filterToColumn[key]]);
       if (Array.isArray(qp)) {
         if (!qp.includes(row[key] || row[filterToColumn[key]])) return false;
       } else {
