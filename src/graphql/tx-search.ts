@@ -274,7 +274,7 @@ export const findTxIDsFromTxFilters = async (
       ? +maybeCursor.txIndex
       : +txsMinHeight_;
 
-  console.log(`txsMinHeight ${txsMinHeight}`);
+  console.log(`txsMinHeight ${typeof txsMinHeight} ${txsMinHeight}`);
 
   const txsMaxHeight_ =
     typeof queryParameters.block === "object" &&
@@ -413,6 +413,12 @@ export const findTxIDsFromTxFilters = async (
       console.log(`SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE tx_index <= ${txsMaxHeight} AND tx_index >= ${txsMinHeight} ${whereQuery} ${bucketQuery} ${pendingFilter} LIMIT ${limit - resultCount + 1
       } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`);
 
+      console.log(pendingFilter && txsMinHeight === -1);
+      console.log(pendingFilter && txsMinHeight === -1 ? await cassandraClient.execute(
+          `SELECT tx_id, tx_index, data_item_index FROM ${KEYSPACE}.${table} WHERE ${pendingFilter} ${whereQuery} ${bucketQuery} LIMIT ${limit - resultCount + 1
+          } ${isBucketSearchTag ? "ALLOW FILTERING" : ""}`,
+          { prepare: true }
+      ).then(r => r.rows) : Promise.resolve([] as Row[]));
 
       const nextResult: Row[] = await Promise.all([
           await cassandraClient.execute(
